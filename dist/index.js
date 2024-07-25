@@ -1906,7 +1906,7 @@ const Ring = ({
         attach: "material",
         color: normalizedColor,
         transparent: true,
-        depthTest: false,
+        depthTest: true,
         opacity: ringOpacity,
         side: DoubleSide,
         fog: true
@@ -1928,7 +1928,7 @@ const Sphere = ({
   selected,
   opacity,
   animated,
-  showRing = true
+  showRing
 }) => {
   const { scale, nodeOpacity } = useSpring({
     from: {
@@ -1962,13 +1962,13 @@ const Sphere = ({
         }
       )
     ] }),
-    showRing && /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsx(
+    /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsx(
       Ring,
       {
-        opacity: selected ? 0.5 : 0,
-        size,
+        opacity: showRing ? 0.5 : selected ? 0.5 : 0,
+        size: showRing ? size / 1.1 : size,
         animated,
-        color: selected ? theme.ring.activeFill : theme.ring.fill,
+        color: showRing ? theme.ring.activeFill : selected ? theme.ring.activeFill : theme.ring.fill,
         strokeWidth: 5
       }
     ) })
@@ -2466,7 +2466,8 @@ const SphereWithIcon = ({
       animated,
       color,
       node,
-      active
+      active,
+      showRing: node.showRing
     }
   ),
   /* @__PURE__ */ jsx(
@@ -2596,8 +2597,7 @@ const Node = ({
   onDragged,
   onPointerOut,
   onContextMenu,
-  renderNode,
-  showRing
+  renderNode
 }) => {
   var _a2, _b2, _c;
   const cameraControls = useCameraControls();
@@ -2695,7 +2695,7 @@ const Node = ({
   useCursor(isDragging, "grabbing");
   const combinedActiveState = shouldHighlight || isDragging;
   const color = combinedActiveState ? node.activeFill || theme.node.activeFill : node.fill || theme.node.fill;
-  const actualShowRing = showRing ?? theme.node.showRing;
+  const actualShowRing = node.showRing;
   const { pointerOver, pointerOut } = useHoverIntent({
     disabled: disabled2 || isDragging,
     onPointerOver: (event) => {
