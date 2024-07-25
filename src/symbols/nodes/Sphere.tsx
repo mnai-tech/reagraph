@@ -14,7 +14,7 @@ export const Sphere: FC<NodeRendererProps> = ({
   selected,
   opacity,
   animated,
-  showRing = true
+  showRing
 }) => {
   const { scale, nodeOpacity } = useSpring({
     from: {
@@ -50,19 +50,25 @@ export const Sphere: FC<NodeRendererProps> = ({
           color={normalizedColor}
         />
       </a.mesh>
-      {showRing && (
+      {
         <a.mesh position={[0, 0, 10]}>
           <Ring
-            opacity={selected ? 0.5 : 0}
+            opacity={showRing ? 0.5 : selected ? 0.5 : 0}
             // size={size / 1.5}
-            size={size}
+            size={showRing ? size / 1.1 : size}
             animated={animated}
-            color={selected ? theme.ring.activeFill : theme.ring.fill}
+            color={
+              showRing
+                ? theme.ring.activeFill
+                : selected
+                  ? theme.ring.activeFill
+                  : theme.ring.fill
+            }
             // strokeWidth={3}
             strokeWidth={5}
           />
         </a.mesh>
-      )}
+      }
     </>
   );
 };

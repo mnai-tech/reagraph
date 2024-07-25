@@ -12987,6 +12987,7 @@ export const Connection = () => {
         "fill": "red",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
+        "showRing":true,
         "data": {
           "id": "487883",
           "loaded": true,
