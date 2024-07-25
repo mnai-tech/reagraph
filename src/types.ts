@@ -36,6 +36,10 @@ export interface GraphElementBaseAttributes<T = any> {
    * Force background color
    */
   backgroundColor?: string;
+  /**
+   * show ring
+   */
+  showRing?: boolean;
 }
 
 export interface GraphNode extends GraphElementBaseAttributes {

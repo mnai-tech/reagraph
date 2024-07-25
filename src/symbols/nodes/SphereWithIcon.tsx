@@ -31,6 +31,7 @@ export const SphereWithIcon: FC<SphereWithIconProps> = ({
       color={color}
       node={node}
       active={active}
+      showRing={node.showRing}
     />
     <Icon
       id={id}

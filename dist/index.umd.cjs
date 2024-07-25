@@ -1901,7 +1901,7 @@
           attach: "material",
           color: normalizedColor,
           transparent: true,
-          depthTest: false,
+          depthTest: true,
           opacity: ringOpacity,
           side: three.DoubleSide,
           fog: true
@@ -1923,7 +1923,7 @@
     selected,
     opacity,
     animated,
-    showRing = true
+    showRing
   }) => {
     const { scale, nodeOpacity } = three$1.useSpring({
       from: {
@@ -1957,13 +1957,13 @@
           }
         )
       ] }),
-      showRing && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsxRuntime.jsx(
+      /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsxRuntime.jsx(
         Ring,
         {
-          opacity: selected ? 0.5 : 0,
-          size,
+          opacity: showRing ? 0.5 : selected ? 0.5 : 0,
+          size: showRing ? size / 1.1 : size,
           animated,
-          color: selected ? theme.ring.activeFill : theme.ring.fill,
+          color: showRing ? theme.ring.activeFill : selected ? theme.ring.activeFill : theme.ring.fill,
           strokeWidth: 5
         }
       ) })
@@ -2461,7 +2461,8 @@
         animated,
         color,
         node,
-        active
+        active,
+        showRing: node.showRing
       }
     ),
     /* @__PURE__ */ jsxRuntime.jsx(
@@ -2591,8 +2592,7 @@
     onDragged,
     onPointerOut,
     onContextMenu,
-    renderNode,
-    showRing
+    renderNode
   }) => {
     var _a2, _b2, _c;
     const cameraControls = useCameraControls();
@@ -2690,7 +2690,7 @@
     glodrei.useCursor(isDragging, "grabbing");
     const combinedActiveState = shouldHighlight || isDragging;
     const color = combinedActiveState ? node.activeFill || theme.node.activeFill : node.fill || theme.node.fill;
-    const actualShowRing = showRing ?? theme.node.showRing;
+    const actualShowRing = node.showRing;
     const { pointerOver, pointerOut } = useHoverIntent({
       disabled: disabled2 || isDragging,
       onPointerOver: (event) => {
