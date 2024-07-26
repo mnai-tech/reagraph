@@ -1960,7 +1960,7 @@
       /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsxRuntime.jsx(
         Ring,
         {
-          opacity: showRing ? 0.5 : selected ? 0.5 : 0,
+          opacity: showRing ? 1 : selected ? 0.5 : 0,
           size: showRing ? size / 1.1 : size,
           animated,
           color: showRing ? theme.ring.activeFill : selected ? theme.ring.activeFill : theme.ring.fill,
