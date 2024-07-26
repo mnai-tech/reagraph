@@ -12786,6 +12786,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
+        "size":1,
         "data": {
           "id": "4874442",
           "loaded": true,
@@ -12854,6 +12855,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
+        "size":1,
         "data": {
           "id": "157918667",
           "loaded": true,
@@ -12899,6 +12901,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
+        "size":1,
         "data": {
           "id": "7320792",
           "loaded": true,
@@ -12967,6 +12970,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
+        "size" : 1,
         "data": {
           "id": "157918165",
           "loaded": true,
@@ -13013,6 +13017,7 @@ export const Connection = () => {
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
         "showRing":true,
+        "size":2,
         "data": {
           "id": "487883",
           "loaded": true,
@@ -13080,6 +13085,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
+        "size":1,
         "data": {
           "id": "158016919",
           "loaded": true,
@@ -13125,6 +13131,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
+        "size":1,
         "data": {
           "id": "32589261",
           "loaded": true,
@@ -13189,6 +13196,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
+        "size":1,
         "data": {
           "id": "752901",
           "loaded": true,
@@ -13313,6 +13321,8 @@ export const Connection = () => {
     nodes={testData.nodes}
     edges={testData.edges}
     defaultNodeSize={1}
+    minNodeSize= {10}
+  maxNodeSize= {15}
     edgeArrowPosition="none"
     renderNode={({ node, ...rest }) => (
       <SphereWithIcon {...rest} node={node} image={node.icon || ""} />
