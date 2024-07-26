@@ -53,7 +53,7 @@ export const Sphere: FC<NodeRendererProps> = ({
       {
         <a.mesh position={[0, 0, 10]}>
           <Ring
-            opacity={showRing ? 0.5 : selected ? 0.5 : 0}
+            opacity={showRing ? 1 : selected ? 0.5 : 0}
             // size={size / 1.5}
             size={showRing ? size / 1.1 : size}
             animated={animated}
