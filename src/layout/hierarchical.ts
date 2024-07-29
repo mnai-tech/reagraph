@@ -42,6 +42,60 @@ export function hierarchical({
 }: HierarchicalLayoutInputs): LayoutStrategy {
   const { nodes, edges } = buildNodeEdges(graph);
 
+  // find root node by finding the nodes which have no incoming edges
+  const parentNodes = nodes.filter(n => !edges.find(e => e.target === n.id));
+  console.log('parentNodes', parentNodes);
+
+  // if more than 1 root node, then we have multiple trees
+  // insert a fake root node to connect all root nodes
+  if (parentNodes.length > 1) {
+    const fakeRootNode: InternalGraphNode = {
+      id: 'fakeRoot',
+      label: '',
+      fill: '#fff',
+      activeFill: '#fff',
+      icon: '',
+      data: {
+        id: 'fakeRoot',
+        loaded: true,
+        extra: {
+          id: 'fakeRoot',
+          properties: {},
+          labels: []
+        },
+        className: '',
+        style: {
+          label: ''
+        }
+      },
+      position: {
+        id: '',
+        data: {},
+        links: [],
+        index: 0,
+        x: 0,
+        y: 0,
+        z: 0,
+        vx: 0,
+        vy: 0
+      }
+    };
+
+    // add fake root node to nodes
+    nodes.push(fakeRootNode);
+
+    // add edges from fake root to root nodes
+    parentNodes.forEach(n => {
+      edges.push({
+        id: `fakeRoot-${n.id}`,
+        source: 'fakeRoot',
+        target: n.id,
+        label: '',
+        backgroundColor: '#fff'
+      });
+    });
+  }
+
   const { depths } = getNodeDepth(nodes, edges);
   const rootNodes = Object.keys(depths).map(d => depths[d]);
 
