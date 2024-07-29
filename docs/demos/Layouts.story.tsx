@@ -12684,6 +12684,63 @@ export const CustomNew = () => {
     pathSelectionType: "all",
   });
 
+  // find root node by finding the nodes which have no incoming edges
+  const rootNodes = testData.nodes.filter(n => !testData.edges.find(e => e.target === n.id));
+  console.log("rootNodes", rootNodes)
+
+  // if more than 1 root node, then we have multiple trees
+  // insert a fake root node to connect all root nodes
+  if (rootNodes.length > 1) {
+    const fakeRootNode = {
+        "id": "fakeRoot",
+        "label": "",
+        "fill": "#fff",
+        "activeFill": "#fff",
+        "icon": "",
+        "data": {
+          "id": "fakeRoot",
+          "loaded": true,
+          "extra": {
+            "id": "fakeRoot",
+            "properties": {
+              "company_type_group": "Limited Liability Partnership (LLP)",
+              "company_number": "fakeRoot",
+              "nationality": null,
+              "name": "fakeRoot",
+              "company_status_group": "Active",
+              "id": 2794668,
+              "date_incorporated": "2005-05-05",
+              "is_company": 1,
+              "psc_kind": null,
+              "gender_name": null,
+              "isRoot": 1
+            },
+            "labels": [
+              "Company"
+            ]
+          },
+          "className": "Company",
+          "style": {
+            "label": ""
+          }
+        }
+      };
+
+    // add fake root node to nodes
+    testData.nodes.push(fakeRootNode);
+
+    // add edges from fake root to root nodes
+    rootNodes.forEach(n => {
+      testData.edges.push({
+        "id": `fakeRoot-${n.id}`,
+        "source": "fakeRoot",
+        "target": n.id,
+        "label": "Corporate entity person with significant control",
+        "backgroundColor": "#fff"
+      });
+    });
+  }
+
   return <GraphCanvas
     ref={ref}
     selections={selections}
@@ -12691,37 +12748,37 @@ export const CustomNew = () => {
     onNodePointerOver={onNodePointerOver}
     onNodePointerOut={onNodePointerOut}
     theme={theme}
-    layoutType="treeTd2d"
+    layoutType="hierarchicalTd"
     draggable
     cameraMode="pan"
     edgeLabelPosition="natural"
     edgeInterpolation='linear'
-    labelType="all"
+    labelType="nodes"
     nodes={testData.nodes}
     edges={testData.edges}
     edgeArrowPosition="none"
     renderNode={({ node, ...rest }) => (
       <SphereWithIcon {...rest} node={node} image={node.icon || ""} />
     )}
-    layoutOverrides={{
-      getNodePosition: (id: string, { nodes }: NodePositionArgs) => {
-        const idx = nodes.findIndex(n => n.id === id);
-        const node = nodes[idx];
-        return node
-        // return {
-        //   x: 25 * idx,
-        //   y: idx % 2 === 0 ? 0 : 50,
-        //   z: 1
-        // };
-      },
-      nodeLevelRatio: 2.5,
-      linkDistance: 800,
-      nodeStrength: -3000,
-      // clusterStrength: 1,
-      // forceLinkStrength: 1,
-      // forceLinkDistance: 300,
-      // nodeSeparation: 100,
-    } as CustomLayoutInputs}
+    // layoutOverrides={{
+    //   getNodePosition: (id: string, { nodes }: NodePositionArgs) => {
+    //     const idx = nodes.findIndex(n => n.id === id);
+    //     const node = nodes[idx];
+    //     return node
+    //     // return {
+    //     //   x: 25 * idx,
+    //     //   y: idx % 2 === 0 ? 0 : 50,
+    //     //   z: 1
+    //     // };
+    //   },
+    //   // nodeLevelRatio: 2.5,
+    //   // linkDistance: 800,
+    //   // nodeStrength: -3000,
+    //   // clusterStrength: 1,
+    //   // forceLinkStrength: 1,
+    //   // forceLinkDistance: 300,
+    //   // nodeSeparation: 100,
+    // } as CustomLayoutInputs}
     contextMenu={({ data, onClose }) => <div style={{ border: "1px solid", height: "200px", width: "200px" }} onClick={onClose}>{data.label}</div>}
   />
 }
@@ -13069,7 +13126,7 @@ export const Connection = () => {
               "company_number": "08523952",
               "name": "44SOUTH LIMITED",
               "is_company": 1,
-              "isRoot": 1
+              "isRoot": 0
             }
           },
           "fill": "red",
