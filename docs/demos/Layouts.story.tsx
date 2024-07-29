@@ -12703,25 +12703,9 @@ export const CustomNew = () => {
     renderNode={({ node, ...rest }) => (
       <SphereWithIcon {...rest} node={node} image={node.icon || ""} />
     )}
-    // layoutOverrides={{
-    //   getNodePosition: (id: string, { nodes }: NodePositionArgs) => {
-    //     const idx = nodes.findIndex(n => n.id === id);
-    //     const node = nodes[idx];
-    //     return node
-    //     // return {
-    //     //   x: 25 * idx,
-    //     //   y: idx % 2 === 0 ? 0 : 50,
-    //     //   z: 1
-    //     // };
-    //   },
-    //   // nodeLevelRatio: 2.5,
-    //   // linkDistance: 800,
-    //   // nodeStrength: -3000,
-    //   // clusterStrength: 1,
-    //   // forceLinkStrength: 1,
-    //   // forceLinkDistance: 300,
-    //   // nodeSeparation: 100,
-    // } as CustomLayoutInputs}
+    layoutOverrides={{
+      nodeSeparation: 1.5,
+    } as CustomLayoutInputs}
     contextMenu={({ data, onClose }) => <div style={{ border: "1px solid", height: "200px", width: "200px" }} onClick={onClose}>{data.label}</div>}
   />
 }
