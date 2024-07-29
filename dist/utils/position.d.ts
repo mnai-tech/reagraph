@@ -49,13 +49,7 @@ export declare function updateNodePosition(node: InternalGraphNode, offset: Vect
     size?: number;
     labelVisible?: boolean;
     backgroundColor?: string;
-    showRing?: boolean; /**
-     * Calculate the center for a quadratic bezier curve.
-     *
-     * 1) Find the point halfway between the start and end points of the desired curve
-     * 2) Find the vector pependicular to that point
-     * 3) Find the point 1/4 the distance between start and end along that vector.
-     */
+    showRing?: boolean;
 };
 /**
  * Calculate the curve offset for an edge.
