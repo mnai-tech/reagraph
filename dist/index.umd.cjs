@@ -1813,7 +1813,7 @@
       )
     ) + 14;
     const height = lines.length * fontSize + 6;
-    return { width, height, text: lines.join("\n") };
+    return { width, height, text: lines.join("\n"), lineCount: lines.length };
   };
   const Label = ({
     text,
@@ -1842,7 +1842,8 @@
     const {
       width,
       height,
-      text: processedText
+      text: processedText,
+      lineCount
     } = react.useMemo(
       () => calculateTextSize(text, fontSize, maxWidth, ellipsis, active),
       [text, fontSize, maxWidth, ellipsis, active]
@@ -1850,7 +1851,7 @@
     return /* @__PURE__ */ jsxRuntime.jsx(glodrei.Billboard, { children: backgroundColor ? /* @__PURE__ */ jsxRuntime.jsx("mesh", { children: /* @__PURE__ */ jsxRuntime.jsxs(
       glodrei.RoundedBox,
       {
-        position: [0, height > 18 ? -3 : 0, 10],
+        position: [0, lineCount * -2, 10],
         args: [width, height, 0],
         radius: borderRadius,
         rotation,
