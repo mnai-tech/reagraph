@@ -50,7 +50,7 @@ export const Ring: FC<RingProps> = ({
   animated,
   strokeWidth,
   innerRadius = 2,
-  segments = 25
+  segments = 50
 }) => {
   const normalizedColor = useMemo(() => new Color(color), [color]);
 
@@ -73,7 +73,7 @@ export const Ring: FC<RingProps> = ({
   const outerRadius = innerRadius + strokeWidthFraction;
 
   return (
-    <Billboard position={[0, 0, 1]}>
+    <Billboard position={[0, 0, 0]}>
       <a.mesh scale={ringSize as any}>
         <ringGeometry
           attach="geometry"

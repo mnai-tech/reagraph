@@ -11,7 +11,8 @@ export const simpleNodes: GraphNode[] =
     label: `Node ${i}`,
     data: {
       priority: random(0, 10)
-    }
+    },
+    showRing: i > 0 ? false : true
   }));
 
 export const parentNodes: GraphNode[] = [
