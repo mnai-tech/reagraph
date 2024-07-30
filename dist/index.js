@@ -1919,7 +1919,7 @@ const Ring = ({
   animated,
   strokeWidth,
   innerRadius = 2,
-  segments = 25
+  segments = 50
 }) => {
   const normalizedColor = useMemo(() => new Color(color), [color]);
   const { ringSize, ringOpacity } = useSpring({
@@ -1938,7 +1938,7 @@ const Ring = ({
   });
   const strokeWidthFraction = strokeWidth / 10;
   const outerRadius = innerRadius + strokeWidthFraction;
-  return /* @__PURE__ */ jsx(Billboard, { position: [0, 0, 1], children: /* @__PURE__ */ jsxs(a.mesh, { scale: ringSize, children: [
+  return /* @__PURE__ */ jsx(Billboard, { position: [0, 0, 0], children: /* @__PURE__ */ jsxs(a.mesh, { scale: ringSize, children: [
     /* @__PURE__ */ jsx(
       "ringGeometry",
       {
@@ -2008,13 +2008,13 @@ const Sphere = ({
         }
       )
     ] }),
-    /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsx(
+    (showRing || selected || active) && /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 0], children: /* @__PURE__ */ jsx(
       Ring,
       {
-        opacity: showRing ? 1 : selected ? 0.5 : 0,
-        size: showRing ? size / 1.1 : size,
+        opacity: 1,
+        size: size / 1,
         animated,
-        color: showRing ? theme.ring.activeFill : selected ? theme.ring.activeFill : theme.ring.fill,
+        color: theme.ring.activeFill,
         strokeWidth: 5
       }
     ) })

@@ -1914,7 +1914,7 @@
     animated,
     strokeWidth,
     innerRadius = 2,
-    segments = 25
+    segments = 50
   }) => {
     const normalizedColor = react.useMemo(() => new three.Color(color), [color]);
     const { ringSize, ringOpacity } = three$1.useSpring({
@@ -1933,7 +1933,7 @@
     });
     const strokeWidthFraction = strokeWidth / 10;
     const outerRadius = innerRadius + strokeWidthFraction;
-    return /* @__PURE__ */ jsxRuntime.jsx(glodrei.Billboard, { position: [0, 0, 1], children: /* @__PURE__ */ jsxRuntime.jsxs(three$1.a.mesh, { scale: ringSize, children: [
+    return /* @__PURE__ */ jsxRuntime.jsx(glodrei.Billboard, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsxs(three$1.a.mesh, { scale: ringSize, children: [
       /* @__PURE__ */ jsxRuntime.jsx(
         "ringGeometry",
         {
@@ -2003,13 +2003,13 @@
           }
         )
       ] }),
-      /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 10], children: /* @__PURE__ */ jsxRuntime.jsx(
+      (showRing || selected || active) && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsx(
         Ring,
         {
-          opacity: showRing ? 1 : selected ? 0.5 : 0,
-          size: showRing ? size / 1.1 : size,
+          opacity: 1,
+          size: size / 1,
           animated,
-          color: showRing ? theme.ring.activeFill : selected ? theme.ring.activeFill : theme.ring.fill,
+          color: theme.ring.activeFill,
           strokeWidth: 5
         }
       ) })
