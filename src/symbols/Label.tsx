@@ -42,7 +42,7 @@ const calculateTextSize = (
     ) + 14;
   const height = lines.length * fontSize + 6;
 
-  return { width, height, text: lines.join('\n') };
+  return { width, height, text: lines.join('\n'), lineCount: lines.length };
 };
 
 export interface LabelProps {
@@ -146,7 +146,8 @@ export const Label: FC<LabelProps> = ({
   const {
     width,
     height,
-    text: processedText
+    text: processedText,
+    lineCount
   } = useMemo(
     () => calculateTextSize(text, fontSize, maxWidth, ellipsis, active),
     [text, fontSize, maxWidth, ellipsis, active]
@@ -157,11 +158,10 @@ export const Label: FC<LabelProps> = ({
       {backgroundColor ? (
         <mesh>
           <RoundedBox
-            position={[0, height > 18 ? -3 : 0, 10]}
+            position={[0, lineCount * -2, 10]}
             args={[width, height, 0]} // Width, height, depth.
             radius={borderRadius}
             rotation={rotation}
-            // scale={active ? [1.05, 1.05, 1.05] : [1, 1, 1]}
           >
             <Text
               font={fontUrl}
