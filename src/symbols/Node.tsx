@@ -419,6 +419,7 @@ export const Node: FC<NodeProps> = ({
         }
       }}
       onDoubleClick={(event: ThreeEvent<MouseEvent>) => {
+        event.stopPropagation();
         if (!disabled && !isDragging) {
           onDoubleClick?.(node, event);
         }

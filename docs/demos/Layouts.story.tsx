@@ -13296,6 +13296,7 @@ export const Connection = () => {
     onNodePointerOut={onNodePointerOut}
     onNodeClick={onNodeClick}
     onCanvasClick={onCanvasClick}
+    onNodeDoubleClick={(node) => { console.log("node",node) }}
     layoutType="forceDirected2d"
     draggable
     cameraMode="pan"
