@@ -116,7 +116,7 @@ export const Arrow: FC<ArrowProps> = ({
       <a.meshBasicMaterial
         attach="material"
         color={normalizedColor}
-        depthTest={false}
+        depthTest={true}
         opacity={arrowOpacity}
         transparent={true}
         side={DoubleSide}
