@@ -2008,7 +2008,7 @@ const Sphere = ({
         }
       )
     ] }),
-    (showRing || selected || active) && /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 1], children: /* @__PURE__ */ jsx(
+    (showRing || selected || active) && /* @__PURE__ */ jsx(a.mesh, { position: [0, 0, 0], children: /* @__PURE__ */ jsx(
       Ring,
       {
         opacity: 1,
