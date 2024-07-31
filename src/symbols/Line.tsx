@@ -162,6 +162,7 @@ export const Line: FC<LineProps> = ({
         opacity={lineOpacity}
         transparent={true}
         color={normalizedColor}
+        depthTest={true}
       />
     </mesh>
   );
