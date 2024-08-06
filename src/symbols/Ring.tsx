@@ -73,8 +73,8 @@ export const Ring: FC<RingProps> = ({
   const outerRadius = innerRadius + strokeWidthFraction;
 
   return (
-    <Billboard position={[0, 0, 0]}>
-      <a.mesh scale={ringSize as any} renderOrder={1}>
+    <Billboard position={[0, 0, 1]}>
+      <a.mesh scale={ringSize as any}>
         <ringGeometry
           attach="geometry"
           args={[innerRadius, outerRadius, segments]}
@@ -83,7 +83,7 @@ export const Ring: FC<RingProps> = ({
           attach="material"
           color={normalizedColor}
           transparent={true}
-          depthTest={false}
+          depthTest={true}
           opacity={ringOpacity}
           side={DoubleSide}
           fog={true}

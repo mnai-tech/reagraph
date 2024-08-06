@@ -1938,7 +1938,7 @@ const Ring = ({
   });
   const strokeWidthFraction = strokeWidth / 10;
   const outerRadius = innerRadius + strokeWidthFraction;
-  return /* @__PURE__ */ jsx(Billboard, { position: [0, 0, 0], children: /* @__PURE__ */ jsxs(a.mesh, { scale: ringSize, renderOrder: 1, children: [
+  return /* @__PURE__ */ jsx(Billboard, { position: [0, 0, 1], children: /* @__PURE__ */ jsxs(a.mesh, { scale: ringSize, children: [
     /* @__PURE__ */ jsx(
       "ringGeometry",
       {
@@ -1952,7 +1952,7 @@ const Ring = ({
         attach: "material",
         color: normalizedColor,
         transparent: true,
-        depthTest: false,
+        depthTest: true,
         opacity: ringOpacity,
         side: DoubleSide,
         fog: true
