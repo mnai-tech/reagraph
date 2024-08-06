@@ -2003,7 +2003,7 @@
           }
         )
       ] }),
-      (showRing || selected || active) && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsx(
+      (showRing || selected || active) && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 1], children: /* @__PURE__ */ jsxRuntime.jsx(
         Ring,
         {
           opacity: 1,
