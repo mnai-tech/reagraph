@@ -1933,7 +1933,7 @@
     });
     const strokeWidthFraction = strokeWidth / 10;
     const outerRadius = innerRadius + strokeWidthFraction;
-    return /* @__PURE__ */ jsxRuntime.jsx(glodrei.Billboard, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsxs(three$1.a.mesh, { scale: ringSize, children: [
+    return /* @__PURE__ */ jsxRuntime.jsx(glodrei.Billboard, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsxs(three$1.a.mesh, { scale: ringSize, renderOrder: 1, children: [
       /* @__PURE__ */ jsxRuntime.jsx(
         "ringGeometry",
         {
@@ -1947,7 +1947,7 @@
           attach: "material",
           color: normalizedColor,
           transparent: true,
-          depthTest: true,
+          depthTest: false,
           opacity: ringOpacity,
           side: three.DoubleSide,
           fog: true
@@ -2003,7 +2003,7 @@
           }
         )
       ] }),
-      (showRing || selected || active) && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 1], children: /* @__PURE__ */ jsxRuntime.jsx(
+      (showRing || selected || active) && /* @__PURE__ */ jsxRuntime.jsx(three$1.a.mesh, { position: [0, 0, 0], children: /* @__PURE__ */ jsxRuntime.jsx(
         Ring,
         {
           opacity: 1,

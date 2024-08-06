@@ -12770,7 +12770,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "4874442",
           "loaded": true,
@@ -12839,7 +12839,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "157918667",
           "loaded": true,
@@ -12885,7 +12885,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "7320792",
           "loaded": true,
@@ -12954,7 +12954,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
-        "size" : 1,
+        "size": 1,
         "data": {
           "id": "157918165",
           "loaded": true,
@@ -13000,8 +13000,8 @@ export const Connection = () => {
         "fill": "red",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
-        "showRing":true,
-        "size":2,
+        "showRing": true,
+        "size": 2,
         "data": {
           "id": "487883",
           "loaded": true,
@@ -13069,7 +13069,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "158016919",
           "loaded": true,
@@ -13115,7 +13115,7 @@ export const Connection = () => {
         "fill": "#7456DB",
         "activeFill": "#2E233B",
         "icon": "/assets/zoomcharts/icons/Company.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "32589261",
           "loaded": true,
@@ -13180,7 +13180,7 @@ export const Connection = () => {
         "fill": "#1dc564",
         "activeFill": "#347851",
         "icon": "/assets/zoomcharts/icons/Officer.png",
-        "size":1,
+        "size": 1,
         "data": {
           "id": "752901",
           "loaded": true,
@@ -13281,10 +13281,10 @@ export const Connection = () => {
     pathHoverType: "direct",
     pathSelectionType: "direct",
     // type:"multi",
-// hotkeys:["selectAll"]
-// focusOnSelect:true
-// disabled:true
-});
+    // hotkeys:["selectAll"]
+    // focusOnSelect:true
+    // disabled:true
+  });
 
 
   return <GraphCanvas
@@ -13296,18 +13296,18 @@ export const Connection = () => {
     onNodePointerOut={onNodePointerOut}
     onNodeClick={onNodeClick}
     onCanvasClick={onCanvasClick}
-    onNodeDoubleClick={(node) => { console.log("node",node) }}
+    onNodeDoubleClick={(node) => { console.log("node", node) }}
     layoutType="forceDirected2d"
     draggable
     cameraMode="pan"
     edgeLabelPosition="natural"
-    edgeInterpolation='linear'    
+    edgeInterpolation='linear'
     labelType="all"
     nodes={testData.nodes}
     edges={testData.edges}
     defaultNodeSize={1}
-    minNodeSize= {10}
-  maxNodeSize= {15}
+    minNodeSize={10}
+    maxNodeSize={15}
     edgeArrowPosition="none"
     renderNode={({ node, ...rest }) => (
       <SphereWithIcon {...rest} node={node} image={node.icon || ""} />
@@ -13322,5 +13322,1549 @@ export const Connection = () => {
       // nodeSeparation: 100,
 
     }}
+  />
+}
+
+export const Network = () => {
+  const theme: Theme = {
+    canvas: {
+      background: "#FAFAFA",
+    },
+    node: {
+      fill: "#272727",
+      activeFill: "#1de9ac",
+      opacity: 1,
+      selectedOpacity: 1,
+      inactiveOpacity: 1,
+      showRing: false,
+      label: {
+        color: "#FFF",
+        activeColor: "#fafafa",
+        fontSize: 4,
+        ellipsis: 100,
+        maxWidth: 50,
+        backgroundColor: "#000",
+        borderRadius: 2,
+      },
+    },
+    edge: {
+      fill: "#d8e6ea",
+      activeFill: "#1DE9AC",
+      opacity: 1,
+      selectedOpacity: 1,
+      inactiveOpacity: 1,
+      label: {
+        color: "#FFF",
+        activeColor: "#fafafa",
+        fontSize: 4,
+        ellipsis: 100,
+        maxWidth: 50,
+        backgroundColor: "#00a2a1",
+        borderRadius: 4,
+      },
+    },
+    lasso: {
+      background: "#fff",
+      border: "none",
+    },
+    arrow: {
+      fill: "#808080",
+      activeFill: "#1de9ac",
+    },
+    ring: {
+      fill: "#464255",
+      activeFill: "#464255",
+    },
+  }
+
+  const testData = {
+    "nodes": [
+      {
+        "id": "38941",
+        "label": "\"REDEMPTORIS MATER\" HOUSE OF FORMATION",
+        "fill": "#7456DB",
+        "showRing": true,
+        "size": 2,
+        "activeFill": "#A291DE",
+        "icon": "/assets/graph/company.svg",
+        "data": {
+          "id": "38941",
+          "loaded": true,
+          "extra": {
+            "id": "38941",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "labels": [
+              "Company"
+            ],
+            "properties": {
+              "date_incorporated": "1994-09-07",
+              "id": 25657,
+              "last_accounts_type": "micro-entity",
+              "date_last_updated": "2024-07-18T11:00:36.140Z",
+              "company_status_display": "Active",
+              "address_string": "11 Harewood Avenue, London, NW1 6LD",
+              "company_type_display": "Private Limited Company by guarantee without share capital, use of `Limited` exemption",
+              "company_type_group": "Limited Company (LTD)",
+              "company_number": "02965770",
+              "name": "\"REDEMPTORIS MATER\" HOUSE OF FORMATION",
+              "is_company": 1,
+              "isRoot": 1
+            }
+          },
+          "style": {
+            "label": "\"REDEMPTORIS MATER\" HOUSE OF FORMATION"
+          },
+          "links": [],
+          "className": "Company",
+          "fill": "#7456DB",
+          "showRing": true,
+          "size": 2
+        }
+      },
+      {
+        "id": "77779728",
+        "label": "Mr John Francis Green",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "77779728",
+          "loaded": true,
+          "extra": {
+            "id": "77779728",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:77779728",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1972-02-01",
+              "last_name": "Green",
+              "middle_name": "Francis",
+              "title": "Mr",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "is_bobble": 0,
+              "name": "Mr John Francis Green",
+              "honours": "",
+              "id": 14175108,
+              "is_company": 0,
+              "first_name": "John",
+              "date_last_updated": "2024-08-01T19:39:14.727Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Mr John Francis Green"
+          },
+          "links": [
+            {
+              "id": "244692555",
+              "from": "77779728",
+              "to": "38941",
+              "extra": {
+                "id": "244692555",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692555",
+                "type": "OFFICER_OF",
+                "startNode": "77779728",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:77779728",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Charity Manager",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "England",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/W96KfkinSLg0Rgu7bOb5m2Iv_rA/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964637,
+                  "date_appointed": "2011-07-07",
+                  "date_last_updated": "2024-07-12T10:17:46.967Z",
+                  "id_person": 14175108,
+                  "address_string": "11 Harewood Avenue, London, NW1 6LD",
+                  "officer_ref": "/company/02965770/appointments/lgw_9GvDJ1d_v92S04TRDIrgDX0",
+                  "name": "John Francis Green",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922469",
+        "label": "Michael James Anderson",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922469",
+          "loaded": true,
+          "extra": {
+            "id": "157922469",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922469",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1949-08-01",
+              "last_name": "Anderson",
+              "title": "",
+              "middle_name": "James",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "is_bobble": 0,
+              "name": "Michael James Anderson",
+              "honours": "",
+              "id": 18130669,
+              "is_company": 0,
+              "first_name": "Michael",
+              "date_last_updated": "2024-08-01T19:39:58.323Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Michael James Anderson"
+          },
+          "links": [
+            {
+              "id": "244692560",
+              "from": "157922469",
+              "to": "38941",
+              "extra": {
+                "id": "244692560",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692560",
+                "type": "OFFICER_OF",
+                "startNode": "157922469",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922469",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Property Manager",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "England",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/4wKo7DAJ76mICapL93zEstRR_HY/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964632,
+                  "date_appointed": "1995-06-08",
+                  "date_last_updated": "2024-07-12T10:10:04.240Z",
+                  "id_person": 18130669,
+                  "address_string": "Ground Floor, 17 Barlby Road, London, England, W10 6AN",
+                  "officer_ref": "/company/02965770/appointments/oar4TRKlLPUeOUUE8P6Un3oFKv8",
+                  "address_premises": "Ground Floor",
+                  "name": "Michael James Anderson",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922466",
+        "label": "Fr Lorenzo Andreini",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922466",
+          "loaded": true,
+          "extra": {
+            "id": "157922466",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922466",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1977-06-01",
+              "last_name": "Andreini",
+              "middle_name": "",
+              "title": "Fr",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "Italian",
+              "name": "Fr Lorenzo Andreini",
+              "honours": "",
+              "id": 18130763,
+              "is_company": 0,
+              "first_name": "Lorenzo",
+              "date_last_updated": "2024-08-01T19:39:19.443Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Fr Lorenzo Andreini"
+          },
+          "links": [
+            {
+              "id": "244692561",
+              "from": "157922466",
+              "to": "38941",
+              "extra": {
+                "id": "244692561",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692561",
+                "type": "OFFICER_OF",
+                "startNode": "157922466",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922466",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Rector",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/qijpsIrFm0YUdnsQUhbSU0HC3Ao/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964633,
+                  "date_appointed": "2015-09-01",
+                  "date_last_updated": "2024-07-12T10:23:44.103Z",
+                  "id_person": 18130763,
+                  "address_string": "11, Harewood Avenue, London, England, NW1 6LD",
+                  "officer_ref": "/company/02965770/appointments/B7Ra7QqJp41f6OsJGjAhphWLoDQ",
+                  "address_premises": "11",
+                  "name": "Lorenzo Andreini",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "14806539",
+        "label": "Peter John Wallach",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "14806539",
+          "loaded": true,
+          "extra": {
+            "id": "14806539",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1941-03-01",
+              "last_name": "Wallach",
+              "title": "",
+              "middle_name": "John",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "name": "Peter John Wallach",
+              "honours": "",
+              "id": 3246442,
+              "is_company": 0,
+              "first_name": "Peter",
+              "date_last_updated": "2024-08-01T19:39:38.550Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Peter John Wallach"
+          },
+          "links": [
+            {
+              "id": "244692551",
+              "from": "14806539",
+              "to": "38941",
+              "extra": {
+                "id": "244692551",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692551",
+                "type": "OFFICER_OF",
+                "startNode": "14806539",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Retired",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/6ArNnmmslBFBocADBCMKk7Lg9T0/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964641,
+                  "date_appointed": "1995-06-08",
+                  "date_last_updated": "2024-07-12T10:17:46.363Z",
+                  "id_person": 3246442,
+                  "address_string": "9 Clovelly Road, Ealing, London, W5 5HF",
+                  "officer_ref": "/company/02965770/appointments/GSs5GUU10lqcrSzrjdDoLUZfaDg",
+                  "name": "Peter John Wallach",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "244692551",
+              "from": "14806539",
+              "to": "38941",
+              "extra": {
+                "id": "244692551",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692551",
+                "type": "OFFICER_OF",
+                "startNode": "14806539",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Retired",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/6ArNnmmslBFBocADBCMKk7Lg9T0/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964641,
+                  "date_appointed": "1995-06-08",
+                  "date_last_updated": "2024-07-12T10:17:46.363Z",
+                  "id_person": 3246442,
+                  "address_string": "9 Clovelly Road, Ealing, London, W5 5HF",
+                  "officer_ref": "/company/02965770/appointments/GSs5GUU10lqcrSzrjdDoLUZfaDg",
+                  "name": "Peter John Wallach",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "286665898",
+              "from": "14806539",
+              "to": "4190873",
+              "extra": {
+                "id": "286665898",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:286665898",
+                "type": "OFFICER_OF",
+                "startNode": "14806539",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+                "endNode": "4190873",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:4190873",
+                "properties": {
+                  "occupation": "Company Director",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/6ArNnmmslBFBocADBCMKk7Lg9T0/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 223197759,
+                  "date_appointed": "2002-11-29",
+                  "date_last_updated": "2024-07-21T04:18:25.933Z",
+                  "id_person": 3246442,
+                  "address_string": "Alderwick James & Co Suite 4, The Sanctuary 23 Oak Hill Grove, Surbiton, Surrey, KT6 6DU",
+                  "officer_ref": "/company/04604319/appointments/PRbvJdh5rvX0VxlQ5gPg6sX-Xwk",
+                  "name": "Peter John Wallach",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922464",
+        "label": "Anthony Matthew Cook",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922464",
+          "loaded": true,
+          "extra": {
+            "id": "157922464",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922464",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1940-11-01",
+              "last_name": "Cook",
+              "title": "",
+              "middle_name": "Matthew",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "is_bobble": 0,
+              "name": "Anthony Matthew Cook",
+              "honours": "",
+              "id": 18131132,
+              "is_company": 0,
+              "first_name": "Anthony",
+              "date_last_updated": "2024-08-01T19:38:23.423Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Anthony Matthew Cook"
+          },
+          "links": [
+            {
+              "id": "244692567",
+              "from": "157922464",
+              "to": "38941",
+              "extra": {
+                "id": "244692567",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692567",
+                "type": "OFFICER_OF",
+                "startNode": "157922464",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922464",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Retired",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/Vlfv8G1QvE_bLpTFCGN5-8G0zFA/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964635,
+                  "date_appointed": "1995-06-08",
+                  "date_last_updated": "2024-07-12T10:33:18.437Z",
+                  "id_person": 18131132,
+                  "address_string": "36 Bromley Street, London, E1 0NB",
+                  "officer_ref": "/company/02965770/appointments/HsCQR31HZyq6AenxswQPWUK8IkE",
+                  "name": "Anthony Matthew Cook",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922465",
+        "label": "Mr John David Hayward",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922465",
+          "loaded": true,
+          "extra": {
+            "id": "157922465",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922465",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1981-08-01",
+              "last_name": "Hayward",
+              "title": "Mr",
+              "middle_name": "David",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "is_bobble": 0,
+              "name": "Mr John David Hayward",
+              "honours": "",
+              "id": 18131074,
+              "is_company": 0,
+              "first_name": "John",
+              "date_last_updated": "2024-08-01T19:38:39.907Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Mr John David Hayward"
+          },
+          "links": [
+            {
+              "id": "244692564",
+              "from": "157922465",
+              "to": "38941",
+              "extra": {
+                "id": "244692564",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692564",
+                "type": "OFFICER_OF",
+                "startNode": "157922465",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922465",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Charity Manager",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/Amu5WniD4tU3arjk8OWLMqiljWE/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964638,
+                  "date_appointed": "2015-07-09",
+                  "date_last_updated": "2024-07-12T10:23:44.817Z",
+                  "id_person": 18131074,
+                  "address_string": "42, Bluebell Avenue, London, United Kingdom, E12 6UJ",
+                  "officer_ref": "/company/02965770/appointments/cCo-nH5nvSdBB5I7eCeOQrsQjCU",
+                  "address_premises": "42",
+                  "name": "John David Hayward",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922457",
+        "label": "Dr Robert Christopher Richmond Horsburgh",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922457",
+          "loaded": true,
+          "extra": {
+            "id": "157922457",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1949-04-01",
+              "last_name": "Horsburgh",
+              "title": "Dr",
+              "middle_name": "Christopher Richmond",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "is_bobble": 0,
+              "name": "Dr Robert Christopher Richmond Horsburgh",
+              "honours": "",
+              "id": 18130089,
+              "is_company": 0,
+              "first_name": "Robert",
+              "date_last_updated": "2024-08-01T19:40:24.647Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Dr Robert Christopher Richmond Horsburgh"
+          },
+          "links": [
+            {
+              "id": "244692558",
+              "from": "157922457",
+              "to": "38941",
+              "extra": {
+                "id": "244692558",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692558",
+                "type": "OFFICER_OF",
+                "startNode": "157922457",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Management Consultant",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964639,
+                  "date_appointed": "2015-07-09",
+                  "date_last_updated": "2024-07-12T10:33:18.240Z",
+                  "id_person": 18130089,
+                  "address_string": "18, Abbotsbury Gardens, Pinner, Middlesex, England, HA5 1SZ",
+                  "officer_ref": "/company/02965770/appointments/6f1oaWPSman8aO-rfKh9h1oaBec",
+                  "address_premises": "18",
+                  "name": "Robert Christopher Richmond Horsburgh",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "287422644",
+              "from": "157922457",
+              "to": "30968833",
+              "extra": {
+                "id": "287422644",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:287422644",
+                "type": "OFFICER_OF",
+                "startNode": "157922457",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+                "endNode": "30968833",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:30968833",
+                "properties": {
+                  "occupation": "It Consultant",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 314084954,
+                  "date_appointed": "2017-03-20",
+                  "date_last_updated": "2024-07-27T06:00:56.390Z",
+                  "id_person": 18130089,
+                  "address_string": "St George's Catholic School, Lanark Road, Maida Vale, London, W9 1RB",
+                  "officer_ref": "/company/08148675/appointments/ZkMGSeGDVHgauF0Q5dISsLqgAfI",
+                  "address_premises": "St George's Catholic School",
+                  "name": "Robert Christopher Richmond Horsburgh",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "244692558",
+              "from": "157922457",
+              "to": "38941",
+              "extra": {
+                "id": "244692558",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692558",
+                "type": "OFFICER_OF",
+                "startNode": "157922457",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Management Consultant",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964639,
+                  "date_appointed": "2015-07-09",
+                  "date_last_updated": "2024-07-12T10:33:18.240Z",
+                  "id_person": 18130089,
+                  "address_string": "18, Abbotsbury Gardens, Pinner, Middlesex, England, HA5 1SZ",
+                  "officer_ref": "/company/02965770/appointments/6f1oaWPSman8aO-rfKh9h1oaBec",
+                  "address_premises": "18",
+                  "name": "Robert Christopher Richmond Horsburgh",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "284824894",
+              "from": "157922457",
+              "to": "28747298",
+              "extra": {
+                "id": "284824894",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:284824894",
+                "type": "OFFICER_OF",
+                "startNode": "157922457",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+                "endNode": "28747298",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:28747298",
+                "properties": {
+                  "occupation": "None Supplied",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 327573699,
+                  "date_appointed": "2018-12-04",
+                  "date_last_updated": "2024-07-08T16:42:45.460Z",
+                  "id_person": 18130089,
+                  "address_string": "St Vincent's Nursing Home, Wiltshire Lane, Eastcote, Pinner, Middlesex, England, HA5 2NB",
+                  "officer_ref": "/company/02721809/appointments/OJ8E-sf2H7dIOAfM9z2bgpK2pqo",
+                  "address_premises": "St Vincent's Nursing Home",
+                  "name": "Robert Christopher Richmond Horsburgh",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            },
+            {
+              "id": "244692558",
+              "from": "157922457",
+              "to": "38941",
+              "extra": {
+                "id": "244692558",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692558",
+                "type": "OFFICER_OF",
+                "startNode": "157922457",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Management Consultant",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964639,
+                  "date_appointed": "2015-07-09",
+                  "date_last_updated": "2024-07-12T10:33:18.240Z",
+                  "id_person": 18130089,
+                  "address_string": "18, Abbotsbury Gardens, Pinner, Middlesex, England, HA5 1SZ",
+                  "officer_ref": "/company/02965770/appointments/6f1oaWPSman8aO-rfKh9h1oaBec",
+                  "address_premises": "18",
+                  "name": "Robert Christopher Richmond Horsburgh",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "157922467",
+        "label": "Terence Fergal Martin",
+        "fill": "#2B922F",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#84C29E",
+        "icon": "/assets/graph/officer.svg",
+        "data": {
+          "id": "157922467",
+          "loaded": true,
+          "extra": {
+            "id": "157922467",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922467",
+            "labels": [
+              "Person"
+            ],
+            "properties": {
+              "date_of_birth": "1954-04-01",
+              "last_name": "Martin",
+              "title": "",
+              "middle_name": "Fergal",
+              "gender_name": "Male",
+              "current": 1,
+              "nationality": "British",
+              "name": "Terence Fergal Martin",
+              "honours": "",
+              "id": 18131075,
+              "is_company": 0,
+              "first_name": "Terence",
+              "date_last_updated": "2024-08-01T19:39:20.770Z",
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "Terence Fergal Martin"
+          },
+          "links": [
+            {
+              "id": "244692565",
+              "from": "157922467",
+              "to": "38941",
+              "extra": {
+                "id": "244692565",
+                "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692565",
+                "type": "OFFICER_OF",
+                "startNode": "157922467",
+                "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922467",
+                "endNode": "38941",
+                "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+                "properties": {
+                  "occupation": "Catholic Book Publisher",
+                  "officer_type_display": "Director",
+                  "country_of_residence": "United Kingdom",
+                  "id_entity_type": 2,
+                  "officer_profile_ref": "/officers/vRfE_1ZqVJv-sA4WD7Y2VC94JpA/appointments",
+                  "entity_type_name": "Individual",
+                  "officer_type_group": "Director",
+                  "current": 1,
+                  "id": 311964640,
+                  "date_appointed": "1995-06-08",
+                  "date_last_updated": "2024-07-12T10:10:14.777Z",
+                  "id_person": 18131075,
+                  "address_string": "48 Selsdon Road, West Norwood, SE27 0PG",
+                  "officer_ref": "/company/02965770/appointments/eyeL9zP8YKld8m2XJYvNTA8gI_M",
+                  "name": "Terence Fergal Martin",
+                  "is_company": 0
+                }
+              },
+              "label": "Director"
+            }
+          ],
+          "className": "MaleOfficer",
+          "fill": "#2B922F",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "30968833",
+        "label": "THE CARDINAL HUME ACADEMIES TRUST",
+        "fill": "#7456DB",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#A291DE",
+        "icon": "/assets/graph/company.svg",
+        "data": {
+          "id": "30968833",
+          "loaded": true,
+          "extra": {
+            "id": "30968833",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:30968833",
+            "labels": [
+              "Company"
+            ],
+            "properties": {
+              "date_incorporated": "2012-07-18",
+              "id": 2976663,
+              "date_last_updated": "2024-03-11T14:20:15.633Z",
+              "company_status_display": "Active",
+              "address_string": "St George's Catholic School Lanark Road, Maida Vale, London, W9 1RB",
+              "company_type_display": "Private Limited Company by guarantee without share capital, use of `Limited` exemption",
+              "company_type_group": "Limited Company (LTD)",
+              "company_number": "08148675",
+              "name": "THE CARDINAL HUME ACADEMIES TRUST",
+              "is_company": 1,
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "THE CARDINAL HUME ACADEMIES TRUST"
+          },
+          "links": [],
+          "className": "Company",
+          "fill": "#7456DB",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "28747298",
+        "label": "ST. VINCENT'S CHARITABLE TRUST",
+        "fill": "#7456DB",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#A291DE",
+        "icon": "/assets/graph/company.svg",
+        "data": {
+          "id": "28747298",
+          "loaded": true,
+          "extra": {
+            "id": "28747298",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:28747298",
+            "labels": [
+              "Company"
+            ],
+            "properties": {
+              "date_incorporated": "1992-06-09",
+              "id": 2768122,
+              "last_accounts_type": "full",
+              "date_last_updated": "2024-06-20T12:00:21.613Z",
+              "company_status_display": "Active",
+              "address_string": "St Vincent's Nursing Home Wiltshire Lane, Eastcote, Pinner, Middlesex, England, HA5 2NB",
+              "company_type_display": "Private Limited Company by guarantee without share capital, use of `Limited` exemption",
+              "company_type_group": "Limited Company (LTD)",
+              "company_number": "02721809",
+              "name": "ST. VINCENT'S CHARITABLE TRUST",
+              "is_company": 1,
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "ST. VINCENT'S CHARITABLE TRUST"
+          },
+          "links": [],
+          "className": "Company",
+          "fill": "#7456DB",
+          "showRing": false,
+          "size": 1
+        }
+      },
+      {
+        "id": "4190873",
+        "label": "THE ADDED RESOURCE LIMITED",
+        "fill": "#7456DB",
+        "showRing": false,
+        "size": 1,
+        "activeFill": "#A291DE",
+        "icon": "/assets/graph/company.svg",
+        "data": {
+          "id": "4190873",
+          "loaded": true,
+          "extra": {
+            "id": "4190873",
+            "elementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:4190873",
+            "labels": [
+              "Company"
+            ],
+            "properties": {
+              "date_incorporated": "2002-11-29",
+              "date_dissolved": "2019-03-05",
+              "id": 2950403,
+              "date_last_updated": "2024-02-22T07:46:54.267Z",
+              "company_status_display": "Dissolved",
+              "address_string": "Alderwick James & Co Suite 4, The Sanctuary 23 Oak Hill Grove, Surbiton, Surrey, KT6 6DU",
+              "company_type_display": "Private limited company",
+              "company_type_group": "Limited Company (LTD)",
+              "company_number": "04604319",
+              "name": "THE ADDED RESOURCE LIMITED",
+              "is_company": 1,
+              "isRoot": 0
+            }
+          },
+          "style": {
+            "label": "THE ADDED RESOURCE LIMITED"
+          },
+          "links": [],
+          "className": "Company",
+          "fill": "#7456DB",
+          "showRing": false,
+          "size": 1
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "244692555",
+        "source": "77779728",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692555",
+          "from": "77779728",
+          "to": "38941",
+          "extra": {
+            "id": "244692555",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692555",
+            "type": "OFFICER_OF",
+            "startNode": "77779728",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:77779728",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Charity Manager",
+              "officer_type_display": "Director",
+              "country_of_residence": "England",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/W96KfkinSLg0Rgu7bOb5m2Iv_rA/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964637,
+              "date_appointed": "2011-07-07",
+              "date_last_updated": "2024-07-12T10:17:46.967Z",
+              "id_person": 14175108,
+              "address_string": "11 Harewood Avenue, London, NW1 6LD",
+              "officer_ref": "/company/02965770/appointments/lgw_9GvDJ1d_v92S04TRDIrgDX0",
+              "name": "John Francis Green",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692560",
+        "source": "157922469",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692560",
+          "from": "157922469",
+          "to": "38941",
+          "extra": {
+            "id": "244692560",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692560",
+            "type": "OFFICER_OF",
+            "startNode": "157922469",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922469",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Property Manager",
+              "officer_type_display": "Director",
+              "country_of_residence": "England",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/4wKo7DAJ76mICapL93zEstRR_HY/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964632,
+              "date_appointed": "1995-06-08",
+              "date_last_updated": "2024-07-12T10:10:04.240Z",
+              "id_person": 18130669,
+              "address_string": "Ground Floor, 17 Barlby Road, London, England, W10 6AN",
+              "officer_ref": "/company/02965770/appointments/oar4TRKlLPUeOUUE8P6Un3oFKv8",
+              "address_premises": "Ground Floor",
+              "name": "Michael James Anderson",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692561",
+        "source": "157922466",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692561",
+          "from": "157922466",
+          "to": "38941",
+          "extra": {
+            "id": "244692561",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692561",
+            "type": "OFFICER_OF",
+            "startNode": "157922466",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922466",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Rector",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/qijpsIrFm0YUdnsQUhbSU0HC3Ao/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964633,
+              "date_appointed": "2015-09-01",
+              "date_last_updated": "2024-07-12T10:23:44.103Z",
+              "id_person": 18130763,
+              "address_string": "11, Harewood Avenue, London, England, NW1 6LD",
+              "officer_ref": "/company/02965770/appointments/B7Ra7QqJp41f6OsJGjAhphWLoDQ",
+              "address_premises": "11",
+              "name": "Lorenzo Andreini",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692551",
+        "source": "14806539",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692551",
+          "from": "14806539",
+          "to": "38941",
+          "extra": {
+            "id": "244692551",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692551",
+            "type": "OFFICER_OF",
+            "startNode": "14806539",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Retired",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/6ArNnmmslBFBocADBCMKk7Lg9T0/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964641,
+              "date_appointed": "1995-06-08",
+              "date_last_updated": "2024-07-12T10:17:46.363Z",
+              "id_person": 3246442,
+              "address_string": "9 Clovelly Road, Ealing, London, W5 5HF",
+              "officer_ref": "/company/02965770/appointments/GSs5GUU10lqcrSzrjdDoLUZfaDg",
+              "name": "Peter John Wallach",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692567",
+        "source": "157922464",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692567",
+          "from": "157922464",
+          "to": "38941",
+          "extra": {
+            "id": "244692567",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692567",
+            "type": "OFFICER_OF",
+            "startNode": "157922464",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922464",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Retired",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/Vlfv8G1QvE_bLpTFCGN5-8G0zFA/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964635,
+              "date_appointed": "1995-06-08",
+              "date_last_updated": "2024-07-12T10:33:18.437Z",
+              "id_person": 18131132,
+              "address_string": "36 Bromley Street, London, E1 0NB",
+              "officer_ref": "/company/02965770/appointments/HsCQR31HZyq6AenxswQPWUK8IkE",
+              "name": "Anthony Matthew Cook",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692564",
+        "source": "157922465",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692564",
+          "from": "157922465",
+          "to": "38941",
+          "extra": {
+            "id": "244692564",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692564",
+            "type": "OFFICER_OF",
+            "startNode": "157922465",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922465",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Charity Manager",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/Amu5WniD4tU3arjk8OWLMqiljWE/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964638,
+              "date_appointed": "2015-07-09",
+              "date_last_updated": "2024-07-12T10:23:44.817Z",
+              "id_person": 18131074,
+              "address_string": "42, Bluebell Avenue, London, United Kingdom, E12 6UJ",
+              "officer_ref": "/company/02965770/appointments/cCo-nH5nvSdBB5I7eCeOQrsQjCU",
+              "address_premises": "42",
+              "name": "John David Hayward",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692558",
+        "source": "157922457",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692558",
+          "from": "157922457",
+          "to": "38941",
+          "extra": {
+            "id": "244692558",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692558",
+            "type": "OFFICER_OF",
+            "startNode": "157922457",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Management Consultant",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964639,
+              "date_appointed": "2015-07-09",
+              "date_last_updated": "2024-07-12T10:33:18.240Z",
+              "id_person": 18130089,
+              "address_string": "18, Abbotsbury Gardens, Pinner, Middlesex, England, HA5 1SZ",
+              "officer_ref": "/company/02965770/appointments/6f1oaWPSman8aO-rfKh9h1oaBec",
+              "address_premises": "18",
+              "name": "Robert Christopher Richmond Horsburgh",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "244692565",
+        "source": "157922467",
+        "target": "38941",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "244692565",
+          "from": "157922467",
+          "to": "38941",
+          "extra": {
+            "id": "244692565",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:244692565",
+            "type": "OFFICER_OF",
+            "startNode": "157922467",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922467",
+            "endNode": "38941",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:38941",
+            "properties": {
+              "occupation": "Catholic Book Publisher",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/vRfE_1ZqVJv-sA4WD7Y2VC94JpA/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 311964640,
+              "date_appointed": "1995-06-08",
+              "date_last_updated": "2024-07-12T10:10:14.777Z",
+              "id_person": 18131075,
+              "address_string": "48 Selsdon Road, West Norwood, SE27 0PG",
+              "officer_ref": "/company/02965770/appointments/eyeL9zP8YKld8m2XJYvNTA8gI_M",
+              "name": "Terence Fergal Martin",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "287422644",
+        "source": "157922457",
+        "target": "30968833",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "287422644",
+          "from": "157922457",
+          "to": "30968833",
+          "extra": {
+            "id": "287422644",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:287422644",
+            "type": "OFFICER_OF",
+            "startNode": "157922457",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+            "endNode": "30968833",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:30968833",
+            "properties": {
+              "occupation": "It Consultant",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 314084954,
+              "date_appointed": "2017-03-20",
+              "date_last_updated": "2024-07-27T06:00:56.390Z",
+              "id_person": 18130089,
+              "address_string": "St George's Catholic School, Lanark Road, Maida Vale, London, W9 1RB",
+              "officer_ref": "/company/08148675/appointments/ZkMGSeGDVHgauF0Q5dISsLqgAfI",
+              "address_premises": "St George's Catholic School",
+              "name": "Robert Christopher Richmond Horsburgh",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "284824894",
+        "source": "157922457",
+        "target": "28747298",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "284824894",
+          "from": "157922457",
+          "to": "28747298",
+          "extra": {
+            "id": "284824894",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:284824894",
+            "type": "OFFICER_OF",
+            "startNode": "157922457",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:157922457",
+            "endNode": "28747298",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:28747298",
+            "properties": {
+              "occupation": "None Supplied",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/ZJBoGo8toy40kV1YATAZLgXbp4w/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 327573699,
+              "date_appointed": "2018-12-04",
+              "date_last_updated": "2024-07-08T16:42:45.460Z",
+              "id_person": 18130089,
+              "address_string": "St Vincent's Nursing Home, Wiltshire Lane, Eastcote, Pinner, Middlesex, England, HA5 2NB",
+              "officer_ref": "/company/02721809/appointments/OJ8E-sf2H7dIOAfM9z2bgpK2pqo",
+              "address_premises": "St Vincent's Nursing Home",
+              "name": "Robert Christopher Richmond Horsburgh",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      },
+      {
+        "id": "286665898",
+        "source": "14806539",
+        "target": "4190873",
+        "label": "Director",
+        "backgroundColor": "#00A2A1",
+        "data": {
+          "id": "286665898",
+          "from": "14806539",
+          "to": "4190873",
+          "extra": {
+            "id": "286665898",
+            "elementId": "5:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:286665898",
+            "type": "OFFICER_OF",
+            "startNode": "14806539",
+            "startNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:14806539",
+            "endNode": "4190873",
+            "endNodeElementId": "4:9143ec59-4bd2-40a1-b4c2-3921e2aa8d4f:4190873",
+            "properties": {
+              "occupation": "Company Director",
+              "officer_type_display": "Director",
+              "country_of_residence": "United Kingdom",
+              "id_entity_type": 2,
+              "officer_profile_ref": "/officers/6ArNnmmslBFBocADBCMKk7Lg9T0/appointments",
+              "entity_type_name": "Individual",
+              "officer_type_group": "Director",
+              "current": 1,
+              "id": 223197759,
+              "date_appointed": "2002-11-29",
+              "date_last_updated": "2024-07-21T04:18:25.933Z",
+              "id_person": 3246442,
+              "address_string": "Alderwick James & Co Suite 4, The Sanctuary 23 Oak Hill Grove, Surbiton, Surrey, KT6 6DU",
+              "officer_ref": "/company/04604319/appointments/PRbvJdh5rvX0VxlQ5gPg6sX-Xwk",
+              "name": "Peter John Wallach",
+              "is_company": 0
+            }
+          },
+          "label": "Director"
+        }
+      }
+    ]
+  }
+
+  const ref = useRef<GraphCanvasRef | null>(null);
+  const { selections, actives, onNodeClick, onCanvasClick, onNodePointerOver, onNodePointerOut } = useSelection({
+    ref: ref,
+    nodes: testData.nodes,
+    edges: testData.edges,
+    pathHoverType: "direct",
+    pathSelectionType: "direct",
+  });
+
+
+  return <GraphCanvas
+    ref={ref}
+    theme={theme}
+    nodes={testData.nodes}
+    edges={testData.edges}
+    layoutType={"forceDirected2d"}
+    edgeInterpolation="linear"
+    draggable
+    cameraMode="pan"
+    edgeLabelPosition="natural"
+    labelType={"nodes"}
+    selections={selections}
+    actives={actives}
+    onNodePointerOver={onNodePointerOver}
+    onNodePointerOut={onNodePointerOut}
+    onCanvasClick={onCanvasClick}
+    onNodeClick={onNodeClick}
+    minNodeSize={10}
+    maxNodeSize={15}
+    minDistance={0} // allows deeper zoom level
+    edgeArrowPosition="none"
+    renderNode={({ node, ...rest }) => (
+      <SphereWithIcon {...rest} node={node} image={node.icon || ""} />
+    )}
   />
 }
