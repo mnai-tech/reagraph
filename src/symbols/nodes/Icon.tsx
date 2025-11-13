@@ -1,8 +1,10 @@
-import React, { FC, useMemo } from 'react';
 import { a, useSpring } from '@react-spring/three';
-import { TextureLoader, LinearFilter, DoubleSide } from 'three';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
+import { DoubleSide, LinearFilter, TextureLoader } from 'three';
+
+import type { NodeRendererProps } from '../../types';
 import { animationConfig } from '../../utils';
-import { NodeRendererProps } from '../../types';
 
 export interface IconProps extends NodeRendererProps {
   /**
@@ -11,7 +13,13 @@ export interface IconProps extends NodeRendererProps {
   image: string;
 }
 
-export const Icon: FC<IconProps> = ({ image, id, size, opacity, animated }) => {
+export const Icon: FC<IconProps> = ({
+  image,
+  id,
+  size,
+  opacity = 1,
+  animated
+}) => {
   const texture = useMemo(() => new TextureLoader().load(image), [image]);
 
   const { scale, spriteOpacity } = useSpring({
@@ -43,8 +51,4 @@ export const Icon: FC<IconProps> = ({ image, id, size, opacity, animated }) => {
       </a.spriteMaterial>
     </a.sprite>
   );
-};
-
-Icon.defaultProps = {
-  opacity: 1
 };

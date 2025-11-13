@@ -1,17 +1,19 @@
-import React, { FC, useMemo } from 'react';
-import { useSpring, a } from '@react-spring/three';
-import { animationConfig } from '../../utils/animation';
+import { a, useSpring } from '@react-spring/three';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 import { Color, DoubleSide } from 'three';
-import { NodeRendererProps } from '../../types';
-import { Ring } from '../Ring';
+
 import { useStore } from '../../store';
+import type { NodeRendererProps } from '../../types';
+import { animationConfig } from '../../utils/animation';
+import { Ring } from '../Ring';
 
 export const Sphere: FC<NodeRendererProps> = ({
   color,
   id,
   size,
-  active,
   selected,
+  active,
   opacity,
   animated,
   showRing
@@ -48,6 +50,8 @@ export const Sphere: FC<NodeRendererProps> = ({
           fog={true}
           opacity={nodeOpacity}
           color={normalizedColor}
+          emissive={normalizedColor}
+          emissiveIntensity={0.7}
         />
       </a.mesh>
       {(showRing || selected || active) && (
@@ -63,9 +67,4 @@ export const Sphere: FC<NodeRendererProps> = ({
       )}
     </>
   );
-};
-
-Sphere.defaultProps = {
-  opacity: 1,
-  active: false
 };

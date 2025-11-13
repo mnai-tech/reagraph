@@ -1,12 +1,13 @@
 import circular from 'graphology-layout/circular.js';
-import { LayoutFactoryProps } from './types';
+
 import { buildNodeEdges } from './layoutUtils';
+import type { LayoutFactoryProps } from './types';
 
 export interface CircularLayoutInputs extends LayoutFactoryProps {
   /**
    * Radius of the circle.
    */
-  radius: 300;
+  radius: number;
 }
 
 export function circular2d({

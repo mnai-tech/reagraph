@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useMemo } from 'react';
-import { useSpring, a } from '@react-spring/three';
-import { Html } from 'glodrei';
-import { ColorRepresentation, Euler } from 'three';
+import { a, useSpring } from '@react-spring/three';
+import { Html } from '@react-three/drei';
+import type { FC } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { ColorRepresentation } from 'three';
+import { Euler } from 'three';
 
 import { useStore } from '../../store';
-import { Theme } from '../../themes';
-import { ContextMenuEvent, InternalGraphEdge } from '../../types';
+import type { ContextMenuEvent, InternalGraphEdge } from '../../types';
 import {
   animationConfig,
   getLabelOffsetByType,
@@ -65,6 +66,11 @@ export interface EdgeProps {
    * The opacity of the edge.
    */
   opacity?: number;
+
+  /**
+   * Whether the edge is active.
+   */
+  active?: boolean;
 }
 
 export const Edge: FC<EdgeProps> = ({
@@ -73,18 +79,27 @@ export const Edge: FC<EdgeProps> = ({
   contextMenu,
   edge,
   labelFontUrl,
-  labelPlacement,
-  opacity
+  labelPlacement = 'inline',
+  opacity,
+  active
 }) => {
   const theme = useStore(state => state.theme);
   const { target, source, label, labelVisible = false, size = 1 } = edge;
 
   const nodes = useStore(store => store.nodes);
-  const from = nodes.find(node => node.id === source);
-  const to = nodes.find(node => node.id === target);
-  const draggingId = useStore(state => state.draggingId);
+  const [from, to] = useMemo(
+    () => [
+      nodes.find(node => node.id === source),
+      nodes.find(node => node.id === target)
+    ],
+    [nodes, source, target]
+  );
+  const isDragging = useStore(state => state.draggingIds.length > 0);
 
-  const labelOffset = (size + theme.edge.label.fontSize) / 2;
+  const labelOffset = useMemo(
+    () => (size + theme.edge.label.fontSize) / 2,
+    [size, theme.edge.label.fontSize]
+  );
 
   const midPoint = useMemo(
     () =>
@@ -109,16 +124,17 @@ export const Edge: FC<EdgeProps> = ({
       },
       config: {
         ...animationConfig,
-        duration: animated && !draggingId ? undefined : 0
+        duration: animated && !isDragging ? undefined : 0
       }
     }),
-    [midPoint, animated, draggingId]
+    [midPoint, animated, isDragging]
   );
 
   const removeContextMenu = useCallback(
-    (edge: InternalGraphEdge) => {
-      edgeContextMenus.delete(edge.id);
-      setEdgeContextMenus(new Set(edgeContextMenus.values()));
+    (edgeId: string) => {
+      const newEdgeContextMenus = new Set(edgeContextMenus);
+      newEdgeContextMenus.delete(edgeId);
+      setEdgeContextMenus(newEdgeContextMenus);
     },
     [edgeContextMenus, setEdgeContextMenus]
   );
@@ -131,9 +147,9 @@ export const Edge: FC<EdgeProps> = ({
         labelPlacement === 'natural'
           ? 0
           : Math.atan(
-            (to.position.y - from.position.y) /
+              (to.position.y - from.position.y) /
                 (to.position.x - from.position.x)
-          )
+            )
       ),
     [
       to.position.x,
@@ -141,6 +157,39 @@ export const Edge: FC<EdgeProps> = ({
       from.position.x,
       from.position.y,
       labelPlacement
+    ]
+  );
+
+  const htmlProps = useMemo(
+    () => ({
+      prepend: true,
+      center: true,
+      position: midPoint
+    }),
+    [midPoint]
+  );
+
+  const labelProps = useMemo(
+    () => ({
+      text: label,
+      ellipsis: 15,
+      fontUrl: labelFontUrl,
+      stroke: theme.edge.label.stroke,
+      color,
+      opacity,
+      fontSize: theme.edge.label.fontSize,
+      rotation: labelRotation,
+      active
+    }),
+    [
+      label,
+      labelFontUrl,
+      theme.edge.label.stroke,
+      color,
+      opacity,
+      theme.edge.label.fontSize,
+      labelRotation,
+      active
     ]
   );
 
@@ -164,17 +213,13 @@ export const Edge: FC<EdgeProps> = ({
         </a.group>
       )}
       {contextMenu && edgeContextMenus.has(edge.id) && (
-        <Html prepend={true} center={true} position={midPoint}>
+        <Html {...htmlProps}>
           {contextMenu({
             data: edge,
-            onClose: () => removeContextMenu(edge)
+            onClose: () => removeContextMenu(edge.id)
           })}
         </Html>
       )}
     </group>
   );
-};
-
-Edge.defaultProps = {
-  labelPlacement: 'inline'
 };

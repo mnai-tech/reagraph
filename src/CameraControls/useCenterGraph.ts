@@ -1,13 +1,17 @@
 import { useThree } from '@react-three/fiber';
-import { useCameraControls } from './useCameraControls';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Vector3, Box3, PerspectiveCamera } from 'three';
-import { useHotkeys } from 'reakeys';
-import { getLayoutCenter } from '../utils/layout';
-import { InternalGraphNode } from '../types';
+import type { PerspectiveCamera } from 'three';
+import { Box3, Vector3 } from 'three';
+
+import { useCameraControls } from '../CameraControls/useCameraControls';
+import {
+  getDegreesToClosest2dAxis,
+  isNodeInView
+} from '../CameraControls/utils';
+import type { LayoutTypes } from '../layout/types';
 import { useStore } from '../store';
-import { isNodeInView, getDegreesToClosest2dAxis } from './utils';
-import { LayoutTypes } from 'layout/types';
+import type { InternalGraphNode } from '../types';
+import { getLayoutCenter } from '../utils/layout';
 
 const PADDING = 50;
 
@@ -121,7 +125,7 @@ export const useCenterGraph = ({
         // Centers the graph based on the central most node
         const { x, y, z } = getLayoutCenter(nodes);
 
-        await controls.setTarget(x, y, z, animated);
+        await controls.normalizeRotations().setTarget(x, y, z, animated);
 
         if (!isCentered) {
           setIsCentered(true);
@@ -243,16 +247,6 @@ export const useCenterGraph = ({
 
     load();
   }, [controls, centerNodes, nodes, animated, camera, fitNodesInView]);
-
-  useHotkeys([
-    {
-      name: 'Center',
-      disabled,
-      category: 'Graph',
-      keys: ['command+shift+c'],
-      callback: () => centerNodes(nodes)
-    }
-  ]);
 
   return { centerNodes, centerNodesById, fitNodesInViewById, isCentered };
 };

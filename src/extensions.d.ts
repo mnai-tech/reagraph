@@ -1,10 +1,15 @@
-import { ReactThreeFiber } from 'react-three-fiber';
-import CameraControls from 'camera-controls';
+import type ThreeCameraControls from 'camera-controls';
+import type * as THREE from 'three';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      threeCameraControls: ReactThreeFiber.Object3DNode<CameraControls, typeof CameraControls>;
-    }
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    threeCameraControls: {
+      ref?: (controls: ThreeCameraControls) => void;
+      args?: [THREE.Camera, HTMLElement];
+      smoothTime?: number;
+      minDistance?: number;
+      maxDistance?: number;
+      dollyToCursor?: boolean;
+    };
   }
 }

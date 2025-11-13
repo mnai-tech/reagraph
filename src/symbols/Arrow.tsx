@@ -1,8 +1,11 @@
-import React, { FC, useMemo, useRef, useEffect, useCallback } from 'react';
-import { useSpring, a } from '@react-spring/three';
-import { Color, ColorRepresentation, Mesh, DoubleSide, Vector3 } from 'three';
-import { animationConfig } from '../utils';
+import { a, useSpring } from '@react-spring/three';
+import type { FC } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { ColorRepresentation, Mesh } from 'three';
+import { Color, DoubleSide, Vector3 } from 'three';
+
 import { useStore } from '../store';
+import { animationConfig } from '../utils';
 
 export type EdgeArrowPosition = 'none' | 'mid' | 'end';
 
@@ -55,18 +58,18 @@ export interface ArrowProps {
 
 export const Arrow: FC<ArrowProps> = ({
   animated,
-  color,
+  color = '#D8E6EA',
   length,
-  opacity,
+  opacity = 0.5,
   position,
   rotation,
-  size,
+  size = 1,
   onActive,
   onContextMenu
 }) => {
   const normalizedColor = useMemo(() => new Color(color), [color]);
   const meshRef = useRef<Mesh | null>(null);
-  const draggingId = useStore(state => state.draggingId);
+  const isDragging = useStore(state => state.draggingIds.length > 0);
   const center = useStore(state => state.centerPosition);
 
   const [{ pos, arrowOpacity }] = useSpring(
@@ -81,10 +84,10 @@ export const Arrow: FC<ArrowProps> = ({
       },
       config: {
         ...animationConfig,
-        duration: animated && !draggingId ? undefined : 0
+        duration: animated && !isDragging ? undefined : 0
       }
     }),
-    [animated, draggingId, opacity, position]
+    [animated, isDragging, opacity, position]
   );
 
   const setQuaternion = useCallback(() => {
@@ -101,12 +104,16 @@ export const Arrow: FC<ArrowProps> = ({
       scale={[1, 1, 1]}
       onPointerOver={() => onActive(true)}
       onPointerOut={() => onActive(false)}
+      // context menu controls
       onPointerDown={event => {
-        // context menu controls
         if (event.nativeEvent.buttons === 2) {
           event.stopPropagation();
-          onContextMenu();
         }
+      }}
+      onContextMenu={event => {
+        event.nativeEvent.preventDefault();
+        event.stopPropagation();
+        onContextMenu();
       }}
     >
       <cylinderGeometry
@@ -124,10 +131,4 @@ export const Arrow: FC<ArrowProps> = ({
       />
     </a.mesh>
   );
-};
-
-Arrow.defaultProps = {
-  size: 1,
-  opacity: 0.5,
-  color: '#D8E6EA'
 };

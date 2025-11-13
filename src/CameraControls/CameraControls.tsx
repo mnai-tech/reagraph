@@ -1,36 +1,34 @@
+import { extend, useFrame, useThree } from '@react-three/fiber';
+import ThreeCameraControls from 'camera-controls';
+import * as holdEvent from 'hold-event';
+import type { ReactNode, Ref } from 'react';
 import React, {
-  FC,
-  useRef,
-  useEffect,
-  useCallback,
   forwardRef,
-  Ref,
+  useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
-  ReactNode
+  useRef,
+  useState
 } from 'react';
-import { useThree, useFrame, extend } from '@react-three/fiber';
 import {
+  Box3,
+  MathUtils,
+  Matrix4,
   MOUSE,
+  Quaternion,
+  Raycaster,
+  Sphere,
+  Spherical,
   Vector2,
   Vector3,
-  Vector4,
-  Quaternion,
-  Matrix4,
-  Spherical,
-  Box3,
-  Sphere,
-  Raycaster,
-  MathUtils
+  Vector4
 } from 'three';
-import ThreeCameraControls from 'camera-controls';
-import {
-  CameraControlsContext,
-  CameraControlsContextProps
-} from './useCameraControls';
-import { useHotkeys } from 'reakeys';
-import * as holdEvent from 'hold-event';
+
 import { useStore } from '../store';
+import { isServerRender } from '../utils/visibility';
+import type { CameraControlsContextProps } from './useCameraControls';
+import { CameraControlsContext } from './useCameraControls';
 
 // Install the camera controls
 // Use a subset for better three shaking
@@ -56,19 +54,7 @@ ThreeCameraControls.install({
 // Extend r3f with the new controls
 extend({ ThreeCameraControls });
 
-const KEY_CODES = {
-  ARROW_LEFT: 37,
-  ARROW_UP: 38,
-  ARROW_RIGHT: 39,
-  ARROW_DOWN: 40
-};
-
-const leftKey = new holdEvent.KeyboardKeyHold(KEY_CODES.ARROW_LEFT, 100);
-const rightKey = new holdEvent.KeyboardKeyHold(KEY_CODES.ARROW_RIGHT, 100);
-const upKey = new holdEvent.KeyboardKeyHold(KEY_CODES.ARROW_UP, 100);
-const downKey = new holdEvent.KeyboardKeyHold(KEY_CODES.ARROW_DOWN, 100);
-
-export type CameraMode = 'pan' | 'rotate' | 'orbit';
+export type CameraMode = 'pan' | 'rotate' | 'orbit' | 'orthographic';
 
 export interface CameraControlsProps {
   /**
@@ -92,23 +78,43 @@ export interface CameraControlsProps {
   disabled?: boolean;
 
   /**
-   * The maximum distance for the camera.
+   * The maximum distance for the camera (perspective mode).
    */
   maxDistance?: number;
 
   /**
-   * The minimum distance for the camera.
+   * The minimum distance for the camera (perspective mode).
    */
   minDistance?: number;
+
+  /**
+   * The maximum zoom level for orthographic cameras.
+   */
+  maxZoom?: number;
+
+  /**
+   * The minimum zoom level for orthographic cameras.
+   */
+  minZoom?: number;
 }
 
 export type CameraControlsRef = CameraControlsContextProps;
 
-export const CameraControls: FC<
-  CameraControlsProps & { ref?: Ref<CameraControlsRef> }
-> = forwardRef(
+export const CameraControls = forwardRef<
+  CameraControlsRef,
+  CameraControlsProps
+>(
   (
-    { mode, children, animated, disabled, minDistance, maxDistance },
+    {
+      mode = 'rotate',
+      children,
+      animated,
+      disabled,
+      minDistance = 1000,
+      maxDistance = 50000,
+      minZoom = 1,
+      maxZoom = 100
+    },
     ref: Ref<CameraControlsRef>
   ) => {
     const cameraRef = useRef<ThreeCameraControls | null>(null);
@@ -116,7 +122,9 @@ export const CameraControls: FC<
     const gl = useThree(state => state.gl);
     const isOrbiting = mode === 'orbit';
     const setPanning = useStore(state => state.setPanning);
-    const draggingId = useStore(state => state.draggingId);
+    const isDragging = useStore(state => state.draggingIds.length > 0);
+    const cameraSpeedRef = useRef(0);
+    const [controlMounted, setControlMounted] = useState<boolean>(false);
 
     useFrame((_state, delta) => {
       if (cameraRef.current?.enabled) {
@@ -218,33 +226,61 @@ export const CameraControls: FC<
       [mode]
     );
 
-    useEffect(() => {
-      if (!disabled) {
-        leftKey.addEventListener('holding', panLeft);
-        rightKey.addEventListener('holding', panRight);
-        upKey.addEventListener('holding', panUp);
-        downKey.addEventListener('holding', panDown);
+    const [keyControls, setKeyControls] = useState<{
+      leftKey: holdEvent.KeyboardKeyHold;
+      rightKey: holdEvent.KeyboardKeyHold;
+      upKey: holdEvent.KeyboardKeyHold;
+      downKey: holdEvent.KeyboardKeyHold;
+    } | null>(null);
 
-        if (typeof window !== 'undefined') {
-          window.addEventListener('keydown', onKeyDown);
-          window.addEventListener('keyup', onKeyUp);
-        }
+    useEffect(() => {
+      // Only initialize on client side
+      if (!isServerRender) {
+        setKeyControls({
+          leftKey: new holdEvent.KeyboardKeyHold('ArrowLeft', 100),
+          rightKey: new holdEvent.KeyboardKeyHold('ArrowRight', 100),
+          upKey: new holdEvent.KeyboardKeyHold('ArrowUp', 100),
+          downKey: new holdEvent.KeyboardKeyHold('ArrowDown', 100)
+        });
+      }
+    }, []);
+
+    useEffect(() => {
+      if (!disabled && keyControls) {
+        keyControls.leftKey.addEventListener('holding', panLeft);
+        keyControls.rightKey.addEventListener('holding', panRight);
+        keyControls.upKey.addEventListener('holding', panUp);
+        keyControls.downKey.addEventListener('holding', panDown);
+
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
       }
 
       return () => {
-        leftKey.removeEventListener('holding', panLeft);
-        rightKey.removeEventListener('holding', panRight);
-        upKey.removeEventListener('holding', panUp);
-        downKey.removeEventListener('holding', panDown);
+        if (keyControls) {
+          keyControls.leftKey.removeEventListener('holding', panLeft);
+          keyControls.rightKey.removeEventListener('holding', panRight);
+          keyControls.upKey.removeEventListener('holding', panUp);
+          keyControls.downKey.removeEventListener('holding', panDown);
 
-        if (typeof window !== 'undefined') {
           window.removeEventListener('keydown', onKeyDown);
           window.removeEventListener('keyup', onKeyUp);
         }
       };
-    }, [disabled, onKeyDown, onKeyUp, panDown, panLeft, panRight, panUp]);
+    }, [
+      disabled,
+      onKeyDown,
+      onKeyUp,
+      panDown,
+      panLeft,
+      panRight,
+      panUp,
+      keyControls
+    ]);
 
     useEffect(() => {
+      const isOrthographic = mode === 'orthographic';
+
       if (disabled) {
         cameraRef.current.mouseButtons.left = ThreeCameraControls.ACTION.NONE;
         cameraRef.current.mouseButtons.middle = ThreeCameraControls.ACTION.NONE;
@@ -253,9 +289,17 @@ export const CameraControls: FC<
         cameraRef.current.mouseButtons.left = ThreeCameraControls.ACTION.TRUCK;
         cameraRef.current.mouseButtons.middle =
           ThreeCameraControls.ACTION.TRUCK;
-        cameraRef.current.mouseButtons.wheel = ThreeCameraControls.ACTION.DOLLY;
+        cameraRef.current.mouseButtons.wheel = isOrthographic
+          ? ThreeCameraControls.ACTION.ZOOM
+          : ThreeCameraControls.ACTION.DOLLY;
       }
-    }, [disabled]);
+
+      // For orthographic cameras, use dedicated zoom props
+      if (isOrthographic && cameraRef.current) {
+        cameraRef.current.maxZoom = maxZoom;
+        cameraRef.current.minZoom = minZoom;
+      }
+    }, [disabled, mode, minZoom, maxZoom]);
 
     useEffect(() => {
       const onControl = () => setPanning(true);
@@ -277,41 +321,23 @@ export const CameraControls: FC<
 
     useEffect(() => {
       // If a node is being dragged, disable the camera controls
-      if (draggingId) {
+      if (isDragging) {
         cameraRef.current.mouseButtons.left = ThreeCameraControls.ACTION.NONE;
+        cameraRef.current.touches.one = ThreeCameraControls.ACTION.NONE;
       } else {
         if (mode === 'rotate') {
           cameraRef.current.mouseButtons.left =
             ThreeCameraControls.ACTION.ROTATE;
+          cameraRef.current.touches.one =
+            ThreeCameraControls.ACTION.TOUCH_ROTATE;
         } else {
+          cameraRef.current.touches.one =
+            ThreeCameraControls.ACTION.TOUCH_TRUCK;
           cameraRef.current.mouseButtons.left =
             ThreeCameraControls.ACTION.TRUCK;
         }
       }
-    }, [draggingId, mode]);
-
-    useHotkeys([
-      {
-        name: 'Zoom In',
-        disabled,
-        category: 'Graph',
-        keys: 'command+shift+i',
-        callback: event => {
-          event.preventDefault();
-          zoomIn();
-        }
-      },
-      {
-        name: 'Zoom Out',
-        category: 'Graph',
-        disabled,
-        keys: 'command+shift+o',
-        callback: event => {
-          event.preventDefault();
-          zoomOut();
-        }
-      }
-    ]);
+    }, [isDragging, mode]);
 
     const values = useMemo(
       () => ({
@@ -325,7 +351,15 @@ export const CameraControls: FC<
         panDown: (deltaTime = 100) => panDown({ deltaTime }),
         panUp: (deltaTime = 100) => panUp({ deltaTime }),
         resetControls: (animated?: boolean) =>
-          cameraRef.current?.reset(animated)
+          cameraRef.current?.normalizeRotations().reset(animated),
+        freeze: () => {
+          // Save the current speed
+          if (cameraRef.current.truckSpeed) {
+            cameraSpeedRef.current = cameraRef.current.truckSpeed;
+          }
+          cameraRef.current.truckSpeed = 0;
+        },
+        unFreeze: () => (cameraRef.current.truckSpeed = cameraSpeedRef.current)
       }),
       // eslint-disable-next-line
       [zoomIn, zoomOut, panLeft, panRight, panDown, panUp, cameraRef.current]
@@ -336,7 +370,13 @@ export const CameraControls: FC<
     return (
       <CameraControlsContext.Provider value={values}>
         <threeCameraControls
-          ref={cameraRef}
+          ref={controls => {
+            cameraRef.current = controls;
+            if (!controlMounted) {
+              // Update the state when the controls are mounted to notify about it component that using that controls
+              setControlMounted(true);
+            }
+          }}
           args={[camera, gl.domElement]}
           smoothTime={0.1}
           minDistance={minDistance}
@@ -348,9 +388,3 @@ export const CameraControls: FC<
     );
   }
 );
-
-CameraControls.defaultProps = {
-  mode: 'rotate',
-  minDistance: 1000,
-  maxDistance: 50000
-};

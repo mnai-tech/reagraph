@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="650" src="docs/assets/logo-light.png">
+  <img width="650" src="stories/assets/logo-light.png">
   <br />
   <br />
   WebGL Network Graphs for React
@@ -33,12 +33,15 @@ Reagraph is a high-performance network graph visualization built in WebGL for Re
 - Checkout the [**docs and demos**](https://reagraph.dev)
 - Checkout a basic demo on [CodeSandbox](https://codesandbox.io/s/reagraph-example-mwh96q)
 - Learn about updates from the [changelog](CHANGELOG.md)
+- Grab the design file for the docs in [Figma](https://www.figma.com/community/file/1524029217670772128/reagraph-landing-page)
+- Improve the docs on [Github](https://github.com/reaviz/reagraph-website)
 
 ## 💎 Other Projects
 
 - [Reaflow](https://reaflow.dev?utm=reagraph) - Open-source library for workflow and diagram graphs.
 - [Reablocks](https://reablocks.dev?utm=reagraph) - Open-source component library for React based on Tailwind.
 - [Reaviz](https://reaviz.dev?utm=reagraph) - Open-source library for data visualizations for React. 
+- [Reachat](https://reachat.dev?utm=reagraph) - Open-source library for building LLM/Chat UIs for React.
 
 ## ✨ Features
 - WebGL based for high performance
@@ -52,8 +55,10 @@ Reagraph is a high-performance network graph visualization built in WebGL for Re
 - Expand/Collapse Nodes
 - Customizable Nodes
 - Advanced Label Placement
-- Edge Interpolation
+- Edge Interpolation and Styling
 - Clustering
+- Edge Bundling
+- Node Badges
 
 with the following built in layouts:
 
@@ -69,7 +74,9 @@ with the following built in layouts:
 - Hierarchical Top Down 2D
 - Hierarchical Left Right 2D
 - No Overlap 2D
-- Force Atlas 2 2D
+- Force Atlas2 2D
+- Concentric 2D
+- Concentric 3D
 
 ## 📦 Usage
 

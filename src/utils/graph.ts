@@ -1,13 +1,16 @@
-import Graph from 'graphology';
-import { nodeSizeProvider, SizingType } from '../sizing';
-import {
+import type Graph from 'graphology';
+
+import type { LayoutStrategy } from '../layout';
+import type { SizingType } from '../sizing';
+import { nodeSizeProvider } from '../sizing';
+import type {
   GraphEdge,
   GraphNode,
   InternalGraphEdge,
   InternalGraphNode
 } from '../types';
-import { calcLabelVisibility, LabelVisibilityType } from './visibility';
-import { LayoutStrategy } from '../layout';
+import type { LabelVisibilityType } from './visibility';
+import { calcLabelVisibility } from './visibility';
 
 /**
  * Initialize the graph with the nodes/edges.
@@ -21,19 +24,31 @@ export function buildGraph(
   // smarter and only add/remove nodes
   graph.clear();
 
+  const addedNodes = new Set<string>();
+
   for (const node of nodes) {
     try {
-      graph.addNode(node.id, node);
-    } catch ({ message }) {
-      console.error(`[Graph] ${message}`);
+      if (!addedNodes.has(node.id)) {
+        graph.addNode(node.id, node);
+        addedNodes.add(node.id);
+      }
+    } catch (e) {
+      console.error(`[Graph] Error adding node '${node.id}`, e);
     }
   }
 
   for (const edge of edges) {
+    if (!addedNodes.has(edge.source) || !addedNodes.has(edge.target)) {
+      continue;
+    }
+
     try {
       graph.addEdge(edge.source, edge.target, edge);
-    } catch ({ message }) {
-      console.error(`[Graph] ${message}`);
+    } catch (e) {
+      console.error(
+        `[Graph] Error adding edge '${edge.source} -> ${edge.target}`,
+        e
+      );
     }
   }
 
@@ -49,6 +64,7 @@ interface TransformGraphInput {
   minNodeSize?: number;
   maxNodeSize?: number;
   defaultNodeSize?: number;
+  clusterAttribute?: string;
 }
 
 /**
@@ -62,7 +78,8 @@ export function transformGraph({
   sizingAttribute,
   defaultNodeSize,
   minNodeSize,
-  maxNodeSize
+  maxNodeSize,
+  clusterAttribute
 }: TransformGraphInput) {
   const nodes: InternalGraphNode[] = [];
   const edges: InternalGraphEdge[] = [];
@@ -96,6 +113,7 @@ export function transformGraph({
       label,
       icon,
       fill,
+      cluster: clusterAttribute ? data[clusterAttribute] : undefined,
       parents,
       data: {
         ...rest,

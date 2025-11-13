@@ -1,11 +1,20 @@
-import React, { FC, useMemo, useState } from 'react';
-import { ClusterGroup, animationConfig, useHoverIntent } from '../utils';
-import { useSpring, a } from '@react-spring/three';
-import { Color, DoubleSide } from 'three';
+import { a, useSpring } from '@react-spring/three';
+import { useCursor } from '@react-three/drei';
+import type { ThreeEvent } from '@react-three/fiber';
+import type { FC } from 'react';
+import React, { useMemo, useState } from 'react';
+import type { Vector3 } from 'three';
+import { Color } from 'three';
+
+import { useCameraControls } from '../CameraControls/useCameraControls';
 import { useStore } from '../store';
+import type { ClusterRenderer } from '../types';
+import type { ClusterGroup } from '../utils';
+import { animationConfig } from '../utils';
+import { useDrag } from '../utils/useDrag';
+import { useHoverIntent } from '../utils/useHoverIntent';
+import { Ring } from './clusters/Ring';
 import { Label } from './Label';
-import { useCursor } from 'glodrei';
-import { ThreeEvent } from '@react-three/fiber';
 
 export type ClusterEventArgs = Omit<ClusterGroup, 'position'>;
 
@@ -55,30 +64,54 @@ export interface ClusterProps extends ClusterGroup {
     cluster: ClusterEventArgs,
     event: ThreeEvent<PointerEvent>
   ) => void;
+
+  /**
+   * Whether the cluster is draggable
+   */
+  draggable?: boolean;
+
+  /**
+   * Triggered after a cluster was dragged
+   */
+  onDragged?: (cluster: ClusterEventArgs) => void;
+
+  /**
+   * Render a custom cluster label
+   */
+  onRender?: ClusterRenderer;
 }
 
 export const Cluster: FC<ClusterProps> = ({
   animated,
   position,
-  padding,
+  padding = 40,
   labelFontUrl,
   disabled,
-  radius,
+  radius = 2,
   nodes,
   label,
   onClick,
   onPointerOver,
-  onPointerOut
+  onPointerOut,
+  draggable = false,
+  onDragged,
+  onRender
 }) => {
   const theme = useStore(state => state.theme);
   const rad = Math.max(position.width, position.height) / 2;
   const offset = rad - radius + padding;
   const [active, setActive] = useState<boolean>(false);
   const center = useStore(state => state.centerPosition);
+  const nodesState = useStore(state => state.nodes);
+  const cameraControls = useCameraControls();
+  const draggingIds = useStore(state => state.draggingIds);
+  const isDraggingCurrent = draggingIds.includes(label);
+  const isDragging = draggingIds.length > 0;
 
   const isActive = useStore(state =>
     state.actives?.some(id => nodes.some(n => n.id === id))
   );
+  const hoveredNodeId = useStore(state => state.hoveredNodeId);
 
   const isSelected = useStore(state =>
     state.selections?.some(id => nodes.some(n => n.id === id))
@@ -92,20 +125,32 @@ export const Cluster: FC<ClusterProps> = ({
       : theme.cluster?.inactiveOpacity
     : theme.cluster?.opacity;
 
-  const { circleOpacity, circlePosition, labelPosition } = useSpring({
+  const labelPosition: [number, number, number] = useMemo(() => {
+    const defaultPosition: [number, number, number] = [0, -offset, 2];
+    const themeOffset = theme.cluster?.label?.offset;
+    if (themeOffset) {
+      return [
+        defaultPosition[0] - themeOffset[0],
+        defaultPosition[1] - themeOffset[1],
+        defaultPosition[2] - themeOffset[2]
+      ];
+    }
+
+    return defaultPosition;
+  }, [offset, theme.cluster?.label?.offset]);
+
+  const { circlePosition } = useSpring({
     from: {
-      circlePosition: [center.x, center.y, -1],
-      circleOpacity: 0,
-      labelPosition: [0, -offset, 2]
+      circlePosition: [center.x, center.y, -1] as [number, number, number]
     },
     to: {
-      labelPosition: [0, -offset, 2],
-      circlePosition: position ? [position.x, position.y, -1] : [0, 0, -1],
-      circleOpacity: opacity
+      circlePosition: position
+        ? ([position.x, position.y, -1] as [number, number, number])
+        : ([0, 0, -1] as [number, number, number])
     },
     config: {
       ...animationConfig,
-      duration: animated ? undefined : 0
+      duration: animated && !isDragging ? undefined : 0
     }
   });
 
@@ -119,12 +164,47 @@ export const Cluster: FC<ClusterProps> = ({
     [theme.cluster?.fill]
   );
 
-  useCursor(active && onClick !== undefined, 'pointer');
+  const addDraggingId = useStore(state => state.addDraggingId);
+  const removeDraggingId = useStore(state => state.removeDraggingId);
+  const setClusterPosition = useStore(state => state.setClusterPosition);
+
+  // Define the drag event handlers for the cluster
+  const bind = useDrag({
+    draggable: draggable && !hoveredNodeId,
+    position: {
+      x: position.x,
+      y: position.y,
+      z: -1
+    } as any,
+    set: (pos: Vector3) => setClusterPosition(label, pos as any),
+    onDragStart: () => {
+      addDraggingId(label);
+      setActive(true);
+    },
+    onDragEnd: () => {
+      removeDraggingId(label);
+      setActive(false);
+      // Get nodes from store with updated position after dragging
+      const updatedClusterNodes = nodesState.filter(n => n.cluster === label);
+      onDragged?.({ nodes: updatedClusterNodes, label });
+    }
+  });
+
+  // Set the cursor to pointer when the cluster is active and not dragging
+  useCursor(active && !isDragging && onClick !== undefined, 'pointer');
+  // Set the cursor to grab when the cluster is active and draggable
+  useCursor(
+    active && draggable && !isDraggingCurrent && onClick === undefined,
+    'grab'
+  );
+  // Set the cursor to grabbing when the cluster is dragging
+  useCursor(isDraggingCurrent, 'grabbing');
 
   const { pointerOver, pointerOut } = useHoverIntent({
     disabled,
     onPointerOver: (event: ThreeEvent<PointerEvent>) => {
       setActive(true);
+      cameraControls.freeze();
       onPointerOver?.(
         {
           nodes,
@@ -135,6 +215,7 @@ export const Cluster: FC<ClusterProps> = ({
     },
     onPointerOut: (event: ThreeEvent<PointerEvent>) => {
       setActive(false);
+      cameraControls.unFreeze();
       onPointerOut?.(
         {
           nodes,
@@ -149,74 +230,70 @@ export const Cluster: FC<ClusterProps> = ({
     () =>
       theme.cluster && (
         <a.group
+          userData={{ id: label, type: 'cluster' }}
           position={circlePosition as any}
           onPointerOver={pointerOver}
           onPointerOut={pointerOut}
           onClick={(event: ThreeEvent<MouseEvent>) => {
-            if (!disabled) {
-              onClick?.(
-                {
-                  nodes,
-                  label
-                },
-                event
-              );
+            if (!disabled && !isDraggingCurrent) {
+              onClick?.({ nodes, label }, event);
             }
           }}
+          {...(bind() as any)}
         >
-          <mesh>
-            <ringGeometry attach="geometry" args={[offset, 0, 128]} />
-            <a.meshBasicMaterial
-              attach="material"
-              color={normalizedFill}
-              transparent={true}
-              depthTest={false}
-              opacity={theme.cluster?.fill ? circleOpacity : 0}
-              side={DoubleSide}
-              fog={true}
-            />
-          </mesh>
-          <mesh>
-            <ringGeometry
-              attach="geometry"
-              args={[offset, rad + padding, 128]}
-            />
-            <a.meshBasicMaterial
-              attach="material"
-              color={normalizedStroke}
-              transparent={true}
-              depthTest={false}
-              opacity={circleOpacity}
-              side={DoubleSide}
-              fog={true}
-            />
-          </mesh>
-          {theme.cluster?.label && (
-            <a.group position={labelPosition as any}>
-              <Label
-                text={label}
+          {onRender ? (
+            onRender({
+              label: {
+                position: labelPosition,
+                text: label,
+                opacity: opacity,
+                fontUrl: labelFontUrl
+              },
+              opacity,
+              outerRadius: offset,
+              innerRadius: rad,
+              padding,
+              theme
+            })
+          ) : (
+            <>
+              <Ring
+                outerRadius={offset}
+                innerRadius={rad}
+                padding={padding}
+                normalizedFill={normalizedFill}
+                normalizedStroke={normalizedStroke}
                 opacity={opacity}
-                fontUrl={labelFontUrl}
-                stroke={theme.cluster.label.stroke}
-                active={false}
-                color={theme.cluster?.label.color}
-                fontSize={12}
-                ellipsis={theme.cluster.label.ellipsis}
-                backgroundColor={theme.cluster.label.backgroundColor}
-                borderRadius={theme.cluster.label.borderRadius}
+                animated={animated}
+                theme={theme}
               />
-            </a.group>
+              {theme.cluster?.label && (
+                <a.group position={labelPosition}>
+                  <Label
+                    text={label}
+                    opacity={opacity}
+                    fontUrl={labelFontUrl}
+                    stroke={theme.cluster.label.stroke}
+                    active={false}
+                    color={theme.cluster?.label.color}
+                    fontSize={theme.cluster?.label.fontSize ?? 12}
+                    ellipsis={theme.cluster.label.ellipsis}
+                    backgroundColor={theme.cluster.label.backgroundColor}
+                    borderRadius={theme.cluster.label.borderRadius}
+                  />
+                </a.group>
+              )}
+            </>
           )}
         </a.group>
       ),
     [
-      theme.cluster,
+      theme,
       circlePosition,
       pointerOver,
       pointerOut,
       offset,
       normalizedFill,
-      circleOpacity,
       rad,
       padding,
       normalizedStroke,
@@ -226,14 +303,13 @@ export const Cluster: FC<ClusterProps> = ({
       labelFontUrl,
       disabled,
       onClick,
-      nodes
+      nodes,
+      bind,
+      isDraggingCurrent,
+      onRender,
+      animated
     ]
   );
 
   return cluster;
-};
-
-Cluster.defaultProps = {
-  radius: 2,
-  padding: 40
 };

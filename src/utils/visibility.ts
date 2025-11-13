@@ -1,5 +1,6 @@
-import { PerspectiveCamera } from 'three';
-import { EdgeLabelPosition } from '../symbols';
+import type { PerspectiveCamera } from 'three';
+
+import type { EdgeLabelPosition } from '../symbols';
 
 export type LabelVisibilityType = 'all' | 'auto' | 'none' | 'nodes' | 'edges';
 
@@ -11,13 +12,18 @@ interface CalcLabelVisibilityArgs {
 }
 
 export function calcLabelVisibility({
-  nodeCount,
   nodePosition,
   labelType,
   camera
 }: CalcLabelVisibilityArgs) {
   return (shape: 'node' | 'edge', size: number) => {
+    const isAlwaysVisible =
+      labelType === 'all' ||
+      (labelType === 'nodes' && shape === 'node') ||
+      (labelType === 'edges' && shape === 'edge');
+
     if (
+      !isAlwaysVisible &&
       camera &&
       nodePosition &&
       camera?.position?.z / camera?.zoom - nodePosition?.z > 6000
@@ -25,11 +31,7 @@ export function calcLabelVisibility({
       return false;
     }
 
-    if (labelType === 'all') {
-      return true;
-    } else if (labelType === 'nodes' && shape === 'node') {
-      return true;
-    } else if (labelType === 'edges' && shape === 'edge') {
+    if (isAlwaysVisible) {
       return true;
     } else if (labelType === 'auto' && shape === 'node') {
       if (size > 7) {
@@ -52,13 +54,15 @@ export function getLabelOffsetByType(
   position: EdgeLabelPosition
 ): number {
   switch (position) {
-  case 'above':
-    return offset;
-  case 'below':
-    return -offset;
-  case 'inline':
-  case 'natural':
-  default:
-    return 0;
+    case 'above':
+      return offset;
+    case 'below':
+      return -offset;
+    case 'inline':
+    case 'natural':
+    default:
+      return 0;
   }
 }
+
+export const isServerRender = typeof window === 'undefined';

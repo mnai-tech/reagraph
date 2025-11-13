@@ -1,14 +1,11 @@
-import React, {
-  FC,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef
-} from 'react';
 import { useThree } from '@react-three/fiber';
+import type { FC, PropsWithChildren } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import type { Mesh, TubeGeometry } from 'three';
+import { Scene, Vector2 } from 'three';
 import { SelectionBox } from 'three-stdlib';
-import { Mesh, Scene, TubeGeometry, Vector2 } from 'three';
-import { useCameraControls } from '../CameraControls';
+
+import { useCameraControls } from '../CameraControls/useCameraControls';
 import { useStore } from '../store';
 import { createElement, prepareRay } from './utils';
 
@@ -60,7 +57,6 @@ export const Lasso: FC<LassoProps> = ({
   const edges = useStore(state => state.edges);
   const edgeMeshes = useStore(state => state.edgeMeshes);
 
-  const mountedRef = useRef<boolean>(false);
   const selectionBoxRef = useRef<SelectionBox | null>(null);
   const edgeMeshSelectionBoxRef = useRef<SelectionBox | null>(null);
   const elementRef = useRef<HTMLDivElement>(createElement(theme));
@@ -70,14 +66,6 @@ export const Lasso: FC<LassoProps> = ({
   const oldControlsEnabledRef = useRef<boolean>(
     cameraControls.controls?.enabled
   );
-
-  useEffect(() => {
-    if (mountedRef.current) {
-      onLasso?.(actives);
-    }
-
-    mountedRef.current = true;
-  }, [actives, onLasso]);
 
   const onPointerMove = useCallback(
     event => {
@@ -104,6 +92,7 @@ export const Lasso: FC<LassoProps> = ({
         const edgesSelected = edgeMeshSelectionBoxRef.current
           .select()
           .sort(o => (o as any).uuid)
+          .filter(o => o.geometry?.userData?.type === type || type === 'all')
           .map(
             edge => edges[edgeMeshes.indexOf(edge as Mesh<TubeGeometry>)].id
           );
@@ -125,6 +114,7 @@ export const Lasso: FC<LassoProps> = ({
         // it prevents the render thrashing and causing flickering
         requestAnimationFrame(() => {
           setActives(allSelected);
+          onLasso?.(allSelected);
         });
 
         document.addEventListener('pointermove', onPointerMove, {
@@ -134,7 +124,7 @@ export const Lasso: FC<LassoProps> = ({
         });
       }
     },
-    [edges, edgeMeshes, setActives, size, type]
+    [size, edges, edgeMeshes, type, setActives, onLasso]
   );
 
   const onPointerUp = useCallback(() => {

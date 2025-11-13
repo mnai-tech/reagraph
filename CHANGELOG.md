@@ -1,3 +1,125 @@
+# 4.30.7 - 11/3/25
+- [feature] Add new props to Badge component for enhanced customization
+  - `opacity`: Control badge background and stroke opacity (0-1)
+  - `fontSize`: Adjust badge text font size
+  - `fontWeight`: Set text weight (100-900)
+  - `iconTextGap`: Control spacing between icon and text
+
+# 4.30.6 - 10/22/25
+- [feature] Add SVG icon support to Badge component with `icon`, `iconSize`, and `iconPosition` props
+  - `icon`: Path or URL to SVG icon
+  - `iconSize`: Size of the icon (default: 0.35)
+  - `iconPosition`: Position relative to text (`'start'`, `'end'`) or custom coordinates `[x, y]`
+
+# 4.30.5 - 9/25/25
+- [feature] Add dedicated `minZoom` and `maxZoom` props for orthographic camera mode
+- [fix] Fix active state z-index positioning and render order for edges
+
+# 4.30.4 - 9/11/25
+- [fix] add orthographic option for the Canvas #382
+- [fix] z-index-fix #380
+
+# 4.30.3 - 8/28/25
+- [fix] Fix edge label rotation when animated=false #379
+- [fix] Add dash style for edges without animation #378
+- [fix] Add color to edges geometries (animated=false) #377
+
+# 4.30.2 - 8/26/25
+- [chore] Add sample with draggable custom layout #375
+
+# 4.30.1 - 8/22/25
+- [fix] Fix lasso selection for edges with disabled animation #372
+
+# 4.30.0 - 8/20/25
+- [feature] Circular (self-loop) edge when node source equals target #357
+- [feature] Display edge label on top when active / hover / selected #370
+- [feature] 3D concentric layout #367
+- [chore] Add story for custom colors on edges #371
+- [fix] Changing Theme during runtime #360
+- [fix] Remove hover effect on invisible rings #369
+- [fix] Min/MaxDistance applying to manual zoom control #368
+- [fix] Hover/Active State on Edge with disabled animation #365
+- [fix] Prevent default browser context menu from appearing on edge right click #363
+- [fix] Draggable nodes on the resized canvas #359
+
+# 4.29.0 - 8/5/25
+- [feature] Added `dashArray` prop to edges, allowing individual control over dash patterns.  
+  The `dashArray` prop accepts a tuple `[dashSize, gapSize]`, letting you specify the length of dashes and the spacing between them for each edge.
+
+# 4.28.0 - 8/1/25
+- [chore] fix: update all major deps & some minor #351
+
+# 4.27.0 - 7/25/25
+- [feature] Add `strokeWidth` and `strokeColor` props to Badge
+- [feature] Add `backgroundColor`, `backgroundOpacity`, `padding`, `strokeColor`, `strokeWidth`, and `radius` props to Label
+
+# 4.26.0 - 7/24/25
+- [feature] concentric layout
+- [feature] node badges
+- [feature] edge styling via dashing
+
+# 4.25.1 - 7/22/25
+- [fix] Display label always for next types: all, nodes, edges #344
+
+# 4.25.0 - 7/8/25
+- [feature] Add Aggregate Edges Functionality #342
+
+# 4.24.2 - 6/24/25
+- [chore] Add docgen script #338
+
+# 4.24.1 - 6/6/25
+- [chore] Update dependencies including React, Three.js, and graphology packages #333
+
+# 4.24.0 - 5/30/25
+- [feature] Add support for the NextJS framework #327
+
+# 4.23.1 - 5/30/25
+- [fix] Can't deselect nodes in multiModifier mode #329
+
+# 4.23.0 - 5/27/25
+- [feature] Upgraded deps to have React v19 compatibility #326
+
+# 4.22.0 - 4/15/25
+- [feature] Remove default hotkeys #319
+
+# 4.21.6 - 4/14/25
+- [fix] Update reakeys & fix hotkeys #317
+
+# 4.21.5 - 3/7/25
+- [fix] bugfix: Validation when adding nodes and edges when building the graph #312
+
+# 4.21.4 - 3/5/25
+- [fix] bugfix: Fixing hardcoded radius #311
+
+# 4.21.3 - 3/5/25
+- [fix] bugfix: Exporting types for hierarchical layout #310
+
+# 4.21.2 - 1/13/25
+- [fix] Fix to make Copy/Paste keyboard shortcuts working with useSelection #302
+
+# 4.21.1 - 12/24/24
+- [fix] fix pan mode on touch devices
+
+# 4.21.0 - 11/22/24
+- [feature] Add ability to define custom cluster #297
+
+# 4.20.1 - 11/13/24
+- [feature] Add onClusterDragged event #296
+
+# 4.20.0 - 11/13/24
+- [chore] Performance Optimizations #295
+- [feature] Cluster Dragging #294
+
+# 4.19.5 - 11/1/24
+- [fix] Update cluster position after node dragging #292
+
+# 4.19.4 - 10/17/24
+- [chore] Add ability to customise Label font size and offset #285
+
+# 4.19.3 - 8/20/24
+- [fix] fixed labelType none still shows label when hovering over node
+- [chore] replace react-use-gesture to @use-gesture/react #257
+
 # 4.19.2 - 6/24/24
 - [chore] Update reakeys #251
 

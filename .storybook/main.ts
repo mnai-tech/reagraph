@@ -1,19 +1,22 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
-  stories: [
-    '../docs/**/*.mdx',
-    '../docs/**/*.story.tsx'
-  ],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-storysource',
-  ],
+  stories: ['../stories/**/*.story.tsx'],
+
+  addons: ['@storybook/addon-docs'],
+
   framework: {
     name: '@storybook/react-vite',
     options: {}
   },
-  staticDirs: ['../public'],
+
+  typescript: {
+    reactDocgen: 'react-docgen-typescript'
+  },
+
+  core: {
+    disableTelemetry: true // XXX: wanted?
+  }
 };
 
 export default config;

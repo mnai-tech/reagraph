@@ -1,7 +1,9 @@
-import React, { FC } from 'react';
-import { NodeRendererProps } from '../../types';
-import { Sphere } from './Sphere';
+import type { FC } from 'react';
+import React from 'react';
+
+import type { NodeRendererProps } from '../../types';
 import { Icon } from './Icon';
+import { Sphere } from './Sphere';
 
 export interface SphereWithIconProps extends NodeRendererProps {
   /**
@@ -14,9 +16,9 @@ export const SphereWithIcon: FC<SphereWithIconProps> = ({
   color,
   id,
   size,
-  opacity,
+  opacity = 1,
   node,
-  active,
+  active = false,
   animated,
   image,
   selected
@@ -46,8 +48,3 @@ export const SphereWithIcon: FC<SphereWithIconProps> = ({
     />
   </>
 );
-
-SphereWithIcon.defaultProps = {
-  opacity: 1,
-  active: false
-};

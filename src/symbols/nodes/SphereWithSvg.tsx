@@ -1,7 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
+import type { ColorRepresentation } from 'three';
+
 import { Sphere } from './Sphere';
-import { Svg, SvgProps } from './Svg';
-import { ColorRepresentation } from 'three';
+import type { SvgProps } from './Svg';
+import { Svg } from './Svg';
 
 export interface SphereWithSvgProps extends SvgProps {
   /**
@@ -19,10 +22,10 @@ export const SphereWithSvg: FC<SphereWithSvgProps> = ({
   color,
   id,
   size,
-  opacity,
+  opacity = 1,
   node,
   svgFill,
-  active,
+  active = false,
   animated,
   image,
   selected,
@@ -53,8 +56,3 @@ export const SphereWithSvg: FC<SphereWithSvgProps> = ({
     />
   </>
 );
-
-SphereWithSvg.defaultProps = {
-  opacity: 1,
-  active: false
-};

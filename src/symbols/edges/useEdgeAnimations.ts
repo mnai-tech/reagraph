@@ -1,8 +1,10 @@
-import { SpringValue, useSpring } from '@react-spring/three';
+import type { SpringValue } from '@react-spring/three';
+import { useSpring } from '@react-spring/three';
 import { useCallback, useEffect, useRef } from 'react';
-import { BufferAttribute, BufferGeometry } from 'three';
+import type { BufferGeometry } from 'three';
+import { BufferAttribute } from 'three';
 
-import { Theme } from '../../themes';
+import type { Theme } from '../../themes';
 import { animationConfig } from '../../utils';
 
 export function useEdgePositionAnimation(
@@ -10,22 +12,26 @@ export function useEdgePositionAnimation(
   animated: boolean
 ): void {
   const geometryRef = useRef<BufferGeometry>(geometry);
+  const bufferPool = useRef<Float32Array | null>(null);
 
   useEffect(() => {
     geometryRef.current = geometry;
+    const positions = geometry.getAttribute('position');
+    bufferPool.current = new Float32Array(positions.array.length);
   }, [geometry]);
 
   const getAnimationPositions = useCallback(() => {
     const positions = geometryRef.current.getAttribute('position');
-    const from = Array.from({
-      length: positions.array.length
-    }).fill(0) as Array<number>;
-    const to = Array.from(positions.array);
-    return { from, to };
+    const from = new Float32Array(positions.array.length);
+    return {
+      from,
+      to: positions.array
+    };
   }, []);
 
   const updateGeometryPosition = useCallback((positions: Array<number>) => {
-    const buffer = new Float32Array(positions);
+    const buffer = bufferPool.current!;
+    buffer.set(positions);
     const newPosition = new BufferAttribute(buffer, 3, false);
     geometryRef.current.setAttribute('position', newPosition);
     newPosition.needsUpdate = true;
@@ -53,7 +59,7 @@ export function useEdgePositionAnimation(
         duration: animated ? undefined : 0
       }
     };
-  }, [animated]);
+  }, [animated, getAnimationPositions, updateGeometryPosition]);
 }
 
 export type UseEdgeOpacityAnimations = {

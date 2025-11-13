@@ -1,15 +1,12 @@
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
-import { GraphCanvasRef } from '../GraphCanvas';
-import { useHotkeys } from 'reakeys';
-import { GraphEdge, GraphNode } from '../types';
+import type { RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import type { GraphCanvasRef } from '../GraphCanvas';
+import type { GraphEdge, GraphNode } from '../types';
+import { isNotEditableElement } from '../utils/dom';
 import { findPath } from '../utils/paths';
-import { getAdjacents, PathSelectionTypes } from './utils';
+import type { PathSelectionTypes } from './utils';
+import { getAdjacents } from './utils';
 
 export type HotkeyTypes = 'selectAll' | 'deselect' | 'delete';
 
@@ -47,11 +44,6 @@ export interface SelectionProps {
    * Disabled or not.
    */
   disabled?: boolean;
-
-  /**
-   * Hotkey types
-   */
-  hotkeys?: HotkeyTypes[];
 
   /**
    * Whether to focus on select or not.
@@ -160,7 +152,6 @@ export const useSelection = ({
   pathHoverType = 'out',
   pathSelectionType = 'direct',
   ref,
-  hotkeys = ['selectAll', 'deselect', 'delete'],
   disabled,
   onSelection
 }: SelectionProps): SelectionResult => {
@@ -310,32 +301,38 @@ export const useSelection = ({
   );
 
   const onKeyDown = useCallback((event: KeyboardEvent) => {
-    const element = event.target as any;
-    const isSafe =
-      element.tagName !== 'INPUT' &&
-      element.tagName !== 'SELECT' &&
-      element.tagName !== 'TEXTAREA' &&
-      !element.isContentEditable;
-
+    const element = event.target as HTMLElement;
+    const isSafe = isNotEditableElement(element);
     const isMeta = event.metaKey || event.ctrlKey;
 
     if (isSafe && isMeta) {
-      event.preventDefault();
       setMetaKeyDown(true);
+    }
+  }, []);
+
+  const onKeyUp = useCallback((event: KeyboardEvent) => {
+    const element = event.target as HTMLElement;
+    const isSafe = isNotEditableElement(element);
+    const isMeta = ['Meta', 'Control'].includes(event.key);
+
+    if (isSafe && isMeta) {
+      setMetaKeyDown(false);
     }
   }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
     }
 
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
       }
     };
-  }, [onKeyDown]);
+  }, [onKeyDown, onKeyUp]);
 
   const onCanvasClick = useCallback(
     (event: MouseEvent) => {
@@ -410,39 +407,6 @@ export const useSelection = ({
       }
     }
   }, [internalSelections, pathSelectionType, ref]);
-
-  useHotkeys([
-    {
-      name: 'Select All',
-      keys: 'mod+a',
-      disabled: !hotkeys.includes('selectAll'),
-      category: 'Graph',
-      description: 'Select all nodes and edges',
-      callback: event => {
-        event.preventDefault();
-
-        if (!disabled && type !== 'single') {
-          const next = nodes.map(n => n.id);
-          onSelection?.(next);
-          setInternalSelections(next);
-        }
-      }
-    },
-    {
-      name: 'Deselect Selections',
-      category: 'Graph',
-      disabled: !hotkeys.includes('deselect'),
-      description: 'Deselect selected nodes and edges',
-      keys: 'escape',
-      callback: event => {
-        if (!disabled) {
-          event.preventDefault();
-          onSelection?.([]);
-          setInternalSelections([]);
-        }
-      }
-    }
-  ]);
 
   const joinedActives = useMemo(
     () => [...internalActives, ...internalHovers],

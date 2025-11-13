@@ -1,7 +1,12 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useSpring, a } from '@react-spring/three';
-import { Arrow, EdgeArrowPosition } from './Arrow';
-import { Label } from './Label';
+import { a, useSpring } from '@react-spring/three';
+import { Html, useCursor } from '@react-three/drei';
+import type { ThreeEvent } from '@react-three/fiber';
+import type { FC } from 'react';
+import React, { useMemo, useState } from 'react';
+import { Euler, Vector3 } from 'three';
+
+import { useStore } from '../store';
+import type { ContextMenuEvent, InternalGraphEdge } from '../types';
 import {
   animationConfig,
   calculateEdgeCurveOffset,
@@ -12,13 +17,13 @@ import {
   getMidPoint,
   getVector
 } from '../utils';
-import { Line } from './Line';
-import { useStore } from '../store';
-import { ContextMenuEvent, InternalGraphEdge } from '../types';
-import { Html, useCursor } from 'glodrei';
+import { calculateSubLabelOffset, getSelfLoopCurve } from '../utils/position';
 import { useHoverIntent } from '../utils/useHoverIntent';
-import { Euler, Vector3 } from 'three';
-import { ThreeEvent } from '@react-three/fiber';
+import type { EdgeArrowPosition } from './Arrow';
+import { Arrow } from './Arrow';
+import { SelfLoop } from './edges/SelfLoop';
+import { Label } from './Label';
+import { Line } from './Line';
 
 /**
  * Label positions relatively edge.
@@ -29,6 +34,14 @@ import { ThreeEvent } from '@react-three/fiber';
  * - natural: normal text positions
  */
 export type EdgeLabelPosition = 'below' | 'above' | 'inline' | 'natural';
+
+/**
+ * SubLabel positions relatively to the main label.
+ *
+ * - below: show subLabel below the main label
+ * - above: show subLabel above the main label
+ */
+export type EdgeSubLabelPosition = 'below' | 'above';
 
 /**
  * Type of edge interpolation.
@@ -63,6 +76,11 @@ export interface EdgeProps {
    * The placement of the edge label.
    */
   labelPlacement?: EdgeLabelPosition;
+
+  /**
+   * The placement of the edge subLabel relative to the main label.
+   */
+  subLabelPlacement?: EdgeSubLabelPosition;
 
   /**
    * The placement of the edge arrow.
@@ -110,20 +128,21 @@ const LABEL_PLACEMENT_OFFSET = 3;
 
 export const Edge: FC<EdgeProps> = ({
   animated,
-  arrowPlacement,
+  arrowPlacement = 'end',
   contextMenu,
   disabled,
-  labelPlacement,
+  labelPlacement = 'inline',
   id,
   interpolation,
   labelFontUrl,
   onContextMenu,
   onClick,
   onPointerOver,
-  onPointerOut
+  onPointerOut,
+  subLabelPlacement = 'below'
 }) => {
   const theme = useStore(state => state.theme);
-  const draggingId = useStore(state => state.draggingId);
+  const isDragging = useStore(state => state.draggingIds.length > 0);
 
   // UI states
   const [active, setActive] = useState<boolean>(false);
@@ -136,24 +155,42 @@ export const Edge: FC<EdgeProps> = ({
     target,
     source,
     label,
+    subLabel,
     labelVisible = false,
     size = 1,
-    backgroundColor
+    fill,
+    dashed = false,
+    dashArray = [3, 1]
   } = edge;
+
+  // Use subLabelPlacement from edge data if available, otherwise use the prop value
+  const effectiveSubLabelPlacement =
+    edge.subLabelPlacement || subLabelPlacement;
+
   const from = useStore(store => store.nodes.find(node => node.id === source));
   const to = useStore(store => store.nodes.find(node => node.id === target));
+
+  // Detect self-loop
+  const isSelfLoop = from.id === to.id;
 
   // Edge properties
   const labelOffset = (size + theme.edge.label.fontSize) / 2;
   const [arrowLength, arrowSize] = useMemo(() => getArrowSize(size), [size]);
+
+  // Use edge-specific interpolation if available, otherwise use global interpolation
+  const effectiveInterpolation = edge.interpolation || interpolation;
+
+  // Use edge-specific arrow placement if available, otherwise use global arrow placement
+  const effectiveArrowPlacement = edge.arrowPlacement || arrowPlacement;
+
   const { curveOffset, curved } = useMemo(
     () =>
       calculateEdgeCurveOffset({
         edge,
         edges,
-        curved: interpolation === 'curved'
+        curved: effectiveInterpolation === 'curved'
       }),
-    [edge, edges, interpolation]
+    [edge, edges, effectiveInterpolation]
   );
 
   const [curve, arrowPosition, arrowRotation] = useMemo(() => {
@@ -172,12 +209,12 @@ export const Edge: FC<EdgeProps> = ({
     );
 
     const [arrowPosition, arrowRotation] = getArrowVectors(
-      arrowPlacement,
+      effectiveArrowPlacement,
       curve,
       arrowLength
     );
 
-    if (arrowPlacement === 'end') {
+    if (effectiveArrowPlacement === 'end') {
       curve = getCurve(
         fromVector,
         fromOffset,
@@ -189,7 +226,7 @@ export const Edge: FC<EdgeProps> = ({
     }
 
     return [curve, arrowPosition, arrowRotation];
-  }, [from, to, curved, curveOffset, arrowPlacement, arrowLength]);
+  }, [from, to, curved, curveOffset, effectiveArrowPlacement, arrowLength]);
 
   const midPoint = useMemo(() => {
     let newMidPoint = getMidPoint(
@@ -202,12 +239,12 @@ export const Edge: FC<EdgeProps> = ({
       // Offset the label to the mid point of the curve
       const offset = new Vector3().subVectors(newMidPoint, curve.getPoint(0.5));
       switch (labelPlacement) {
-      case 'above':
-        offset.y = offset.y - LABEL_PLACEMENT_OFFSET;
-        break;
-      case 'below':
-        offset.y = offset.y + LABEL_PLACEMENT_OFFSET;
-        break;
+        case 'above':
+          offset.y = offset.y - LABEL_PLACEMENT_OFFSET;
+          break;
+        case 'below':
+          offset.y = offset.y + LABEL_PLACEMENT_OFFSET;
+          break;
       }
       newMidPoint = newMidPoint.sub(offset);
     }
@@ -215,16 +252,27 @@ export const Edge: FC<EdgeProps> = ({
     return newMidPoint;
   }, [from.position, to.position, labelOffset, labelPlacement, curved, curve]);
 
+  const center = useStore(state => state.centerPosition);
+
   const isSelected = useStore(state => state.selections?.includes(id));
   const hasSelections = useStore(state => state.selections?.length);
   const isActive = useStore(state => state.actives?.includes(id));
-  const center = useStore(state => state.centerPosition);
+  const isActiveState = active || isActive || isSelected;
 
   const selectionOpacity = hasSelections
     ? isSelected || isActive
       ? theme.edge.selectedOpacity
       : theme.edge.inactiveOpacity
     : theme.edge.opacity;
+
+  // Calculate subLabel position based on edge orientation and subLabelPlacement
+  const subLabelOffset = useMemo(() => {
+    return calculateSubLabelOffset(
+      from.position,
+      to.position,
+      effectiveSubLabelPlacement
+    );
+  }, [from.position, to.position, effectiveSubLabelPlacement]);
 
   const [{ labelPosition }] = useSpring(
     () => ({
@@ -236,10 +284,10 @@ export const Edge: FC<EdgeProps> = ({
       },
       config: {
         ...animationConfig,
-        duration: animated && !draggingId ? undefined : 0
+        duration: animated && !isDragging ? undefined : 0
       }
     }),
-    [midPoint, animated, draggingId]
+    [midPoint, animated, isDragging]
   );
 
   const labelRotation = useMemo(
@@ -250,9 +298,9 @@ export const Edge: FC<EdgeProps> = ({
         labelPlacement === 'natural'
           ? 0
           : Math.atan(
-            (to.position.y - from.position.y) /
+              (to.position.y - from.position.y) /
                 (to.position.x - from.position.x)
-          )
+            )
       ),
     [
       to.position.x,
@@ -263,7 +311,7 @@ export const Edge: FC<EdgeProps> = ({
     ]
   );
 
-  useCursor(active && !draggingId && onClick !== undefined, 'pointer');
+  useCursor(active && !isDragging && onClick !== undefined, 'pointer');
 
   const { pointerOver, pointerOut } = useHoverIntent({
     disabled,
@@ -277,95 +325,150 @@ export const Edge: FC<EdgeProps> = ({
     }
   });
 
-  const arrowComponent = useMemo(
-    () =>
-      arrowPlacement !== 'none' && (
-        <Arrow
-          animated={animated}
-          color={
-            isSelected || active || isActive
-              ? theme.arrow.activeFill
-              : theme.arrow.fill
+  const selfLoopCurve = useMemo(() => getSelfLoopCurve(from), [from]);
+
+  const arrowComponent = useMemo(() => {
+    if (effectiveArrowPlacement === 'none') return null;
+
+    let position: Vector3;
+    let rotation: Vector3;
+
+    if (isSelfLoop && selfLoopCurve) {
+      // Arrow for self-loop
+      const uEnd = 0.58;
+      const uMid = 0.25;
+      if (effectiveArrowPlacement === 'mid') {
+        position = selfLoopCurve.getPointAt(uMid);
+        rotation = selfLoopCurve.getTangentAt(uMid);
+      } else {
+        // end is default
+        position = selfLoopCurve.getPointAt(uEnd);
+        rotation = selfLoopCurve.getTangentAt(uEnd);
+      }
+    } else {
+      // Arrow for normal edge
+      position = arrowPosition;
+      rotation = arrowRotation;
+    }
+
+    return (
+      <Arrow
+        animated={animated}
+        color={
+          isActiveState ? theme.arrow.activeFill : fill || theme.arrow.fill
+        }
+        length={arrowLength}
+        opacity={selectionOpacity}
+        position={position}
+        rotation={rotation}
+        size={arrowSize}
+        onActive={setActive}
+        onContextMenu={() => {
+          if (!disabled) {
+            setMenuVisible(true);
+            onContextMenu?.(edge);
           }
-          length={arrowLength}
-          opacity={selectionOpacity}
-          position={arrowPosition}
-          rotation={arrowRotation}
-          size={arrowSize}
-          onActive={setActive}
+        }}
+      />
+    );
+  }, [
+    fill,
+    animated,
+    arrowLength,
+    effectiveArrowPlacement,
+    arrowPosition,
+    arrowRotation,
+    arrowSize,
+    disabled,
+    edge,
+    isActiveState,
+    onContextMenu,
+    selectionOpacity,
+    theme.arrow.activeFill,
+    theme.arrow.fill,
+    isSelfLoop,
+    selfLoopCurve
+  ]);
+
+  const labelComponent = useMemo(
+    () =>
+      labelVisible &&
+      label && (
+        <a.group
+          position={labelPosition as any}
           onContextMenu={() => {
             if (!disabled) {
               setMenuVisible(true);
               onContextMenu?.(edge);
             }
           }}
-        />
-      ),
-    [
-      active,
-      animated,
-      arrowLength,
-      arrowPlacement,
-      arrowPosition,
-      arrowRotation,
-      arrowSize,
-      disabled,
-      edge,
-      isActive,
-      isSelected,
-      onContextMenu,
-      selectionOpacity,
-      theme.arrow.activeFill,
-      theme.arrow.fill
-    ]
-  );
-
-  const labelComponent = useMemo(
-    () =>
-      labelVisible &&
-      label && (
-        <a.group position={labelPosition as any}>
+          onPointerOver={pointerOver}
+          onPointerOut={pointerOut}
+        >
           <Label
             text={label}
-            ellipsis={theme.edge.label.ellipsis}
+            ellipsis={15}
             fontUrl={labelFontUrl}
             stroke={theme.edge.label.stroke}
             color={
-              isSelected || active || isActive
+              isActiveState
                 ? theme.edge.label.activeColor
                 : theme.edge.label.color
             }
             opacity={selectionOpacity}
             fontSize={theme.edge.label.fontSize}
-            maxWidth={theme.edge.label.maxWidth}
             rotation={labelRotation}
-            backgroundColor={
-              backgroundColor
-                ? backgroundColor
-                : theme.edge.label.backgroundColor
-            }
-            borderRadius={theme.edge.label.borderRadius}
+            active={isActiveState}
           />
+
+          {subLabel && (
+            <group position={[subLabelOffset.x, subLabelOffset.y, 0]}>
+              <Label
+                text={subLabel}
+                ellipsis={15}
+                fontUrl={labelFontUrl}
+                stroke={theme.edge.subLabel?.stroke || theme.edge.label.stroke}
+                active={isActiveState}
+                color={
+                  isActiveState
+                    ? theme.edge.subLabel?.activeColor ||
+                      theme.edge.label.activeColor
+                    : theme.edge.subLabel?.color || theme.edge.label.color
+                }
+                opacity={selectionOpacity}
+                fontSize={
+                  theme.edge.subLabel?.fontSize ||
+                  theme.edge.label.fontSize * 0.8
+                }
+                rotation={labelRotation}
+              />
+            </group>
+          )}
         </a.group>
       ),
     [
-      active,
-      isActive,
-      isSelected,
+      disabled,
+      edge,
+      isActiveState,
       label,
+      subLabel,
       labelFontUrl,
       labelPosition,
+      subLabelOffset,
       labelRotation,
       labelVisible,
+      onContextMenu,
+      pointerOut,
+      pointerOver,
       selectionOpacity,
       theme.edge.label.activeColor,
       theme.edge.label.color,
       theme.edge.label.fontSize,
-      theme.edge.label.maxWidth,
-      theme.edge.label.ellipsis,
       theme.edge.label.stroke,
-      theme.edge.label.backgroundColor,
-      theme.edge.label.borderRadius
+      theme.edge.subLabel?.stroke,
+      theme.edge.subLabel?.activeColor,
+      theme.edge.subLabel?.color,
+      theme.edge.subLabel?.fontSize
     ]
   );
 
@@ -380,69 +483,65 @@ export const Edge: FC<EdgeProps> = ({
     [menuVisible, contextMenu, midPoint, edge]
   );
 
-  const lineComponent = useMemo(
-    () => (
-      <Line
-        curveOffset={curveOffset}
-        animated={animated}
-        color={
-          isSelected || active || isActive
-            ? theme.arrow.activeFill
-            : theme.arrow.fill
-        }
-        curve={curve}
-        curved={curved}
-        id={id}
-        opacity={selectionOpacity}
-        size={size}
-        onClick={event => {
-          if (!disabled) {
-            onClick?.(edge, event);
-          }
-        }}
-        onPointerOver={pointerOver}
-        onPointerOut={pointerOut}
-        onContextMenu={() => {
-          if (!disabled) {
-            setMenuVisible(true);
-            onContextMenu?.(edge);
-          }
-        }}
-      />
-    ),
-    [
-      active,
-      animated,
-      curve,
-      curveOffset,
-      curved,
-      disabled,
-      edge,
-      id,
-      isActive,
-      isSelected,
-      onClick,
-      onContextMenu,
-      pointerOut,
-      pointerOver,
-      selectionOpacity,
-      size,
-      theme.arrow.activeFill,
-      theme.arrow.fill
-    ]
-  );
-
   return (
-    <group>
+    <group position={[0, 0, isActiveState ? 1 : 0]}>
+      {isSelfLoop && selfLoopCurve ? (
+        <SelfLoop
+          id={id}
+          curve={selfLoopCurve}
+          size={size}
+          animated={animated}
+          color={
+            isActiveState ? theme.edge.activeFill : fill || theme.edge.fill
+          }
+          opacity={selectionOpacity}
+          onClick={event => {
+            if (!disabled) {
+              onClick?.(edge, event);
+            }
+          }}
+          onContextMenu={() => {
+            if (!disabled) {
+              setMenuVisible(true);
+              onContextMenu?.(edge);
+            }
+          }}
+          onPointerOver={pointerOver}
+          onPointerOut={pointerOut}
+        />
+      ) : (
+        <Line
+          curveOffset={curveOffset}
+          animated={animated}
+          color={
+            isActiveState ? theme.edge.activeFill : fill || theme.edge.fill
+          }
+          curve={curve}
+          curved={curved}
+          dashed={dashed}
+          dashArray={dashArray}
+          id={id}
+          opacity={selectionOpacity}
+          size={size}
+          renderOrder={isActiveState ? 0 : -1}
+          onClick={event => {
+            if (!disabled) {
+              onClick?.(edge, event);
+            }
+          }}
+          onPointerOver={pointerOver}
+          onPointerOut={pointerOut}
+          onContextMenu={() => {
+            if (!disabled) {
+              setMenuVisible(true);
+              onContextMenu?.(edge);
+            }
+          }}
+        />
+      )}
       {arrowComponent}
-      {lineComponent}
-      {menuComponent}
       {labelComponent}
+      {menuComponent}
     </group>
   );
-};
-
-Edge.defaultProps = {
-  labelPlacement: 'inline',
-  arrowPlacement: 'end'
 };

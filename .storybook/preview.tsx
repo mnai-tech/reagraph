@@ -1,6 +1,8 @@
-import { Stats } from 'glodrei';
+import { Stats } from '@react-three/drei';
+import type { Preview } from '@storybook/react-vite';
+import React from 'react';
+
 import theme from './theme';
-import { Preview } from '@storybook/react';
 
 const withProvider = (Story, context) => (
   <>
@@ -14,9 +16,10 @@ const preview: Preview = {
   parameters: {
     layout: 'centered',
     controls: { hideNoControlsWarning: true },
-    actions: { argTypesRegex: '^on.*' },
+    actions: { argTypesRegex: '^on[A-Z].*' },
     docs: {
-      theme
+      theme,
+      codePanel: true
     },
     options: {
       storySort: {

@@ -1,20 +1,19 @@
-import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
-import { PerspectiveCamera } from 'three';
-import { SizingType } from './sizing';
-import {
-  LayoutTypes,
-  layoutProvider,
-  LayoutStrategy,
-  LayoutOverrides
-} from './layout';
-import { LabelVisibilityType, calcLabelVisibility } from './utils/visibility';
-import { tick } from './layout/layoutUtils';
-import { GraphEdge, GraphNode } from './types';
-import { buildGraph, transformGraph } from './utils/graph';
-import { DragReferences, useStore } from './store';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { PerspectiveCamera } from 'three';
+
 import { getVisibleEntities } from './collapse';
+import type { LayoutOverrides, LayoutStrategy, LayoutTypes } from './layout';
+import { layoutProvider } from './layout';
+import { tick } from './layout/layoutUtils';
+import type { SizingType } from './sizing';
+import type { DragReferences } from './store';
+import { useStore } from './store';
+import type { GraphEdge, GraphNode, InternalGraphNode } from './types';
 import { calculateClusters } from './utils/cluster';
+import { buildGraph, transformGraph } from './utils/graph';
+import type { LabelVisibilityType } from './utils/visibility';
+import { calcLabelVisibility } from './utils/visibility';
 
 export interface GraphInputs {
   nodes: GraphNode[];
@@ -30,6 +29,7 @@ export interface GraphInputs {
   defaultNodeSize?: number;
   minNodeSize?: number;
   maxNodeSize?: number;
+  constrainDragging?: boolean;
   layoutOverrides?: LayoutOverrides;
 }
 
@@ -47,9 +47,12 @@ export const useGraph = ({
   defaultNodeSize,
   maxNodeSize,
   minNodeSize,
-  layoutOverrides
+  layoutOverrides,
+  constrainDragging
 }: GraphInputs) => {
   const graph = useStore(state => state.graph);
+  const clusters = useStore(state => state.clusters);
+  const storedNodes = useStore(state => state.nodes);
   const setClusters = useStore(state => state.setClusters);
   const stateCollapsedNodeIds = useStore(state => state.collapsedNodeIds);
   const setEdges = useStore(state => state.setEdges);
@@ -63,7 +66,30 @@ export const useGraph = ({
   const layoutMounted = useRef<boolean>(false);
   const layout = useRef<LayoutStrategy | null>(null);
   const camera = useThree(state => state.camera) as PerspectiveCamera;
+  const dragRef = useRef<DragReferences>(drags);
+  const clustersRef = useRef<any>([]);
 
+  // When a new node is added, remove the dragged position of the cluster nodes to put new node in the right place
+  useEffect(() => {
+    if (!clusterAttribute) {
+      return;
+    }
+
+    const existedNodesIds = storedNodes.map(n => n.id);
+    const newNode = nodes.find(n => !existedNodesIds.includes(n.id));
+    if (newNode) {
+      const clusterName = newNode.data[clusterAttribute];
+      const cluster = clusters.get(clusterName);
+      const drags = { ...dragRef.current };
+
+      cluster?.nodes?.forEach(node => (drags[node.id] = undefined));
+
+      dragRef.current = drags;
+      setDrags(drags);
+    }
+  }, [storedNodes, nodes, clusterAttribute, clusters, setDrags]);
+
+  // Calculate the visible entities
   const { visibleEdges, visibleNodes } = useMemo(
     () =>
       getVisibleEntities({
@@ -74,11 +100,16 @@ export const useGraph = ({
     [stateCollapsedNodeIds, nodes, edges]
   );
 
-  // Transient updates
-  const dragRef = useRef<DragReferences>(drags);
-  useEffect(() => {
-    dragRef.current = drags;
-  }, [drags]);
+  // Store node positions inside drags state
+  const updateDrags = useCallback(
+    (nodes: InternalGraphNode[]) => {
+      const drags = { ...dragRef.current };
+      nodes.forEach(node => (drags[node.id] = node));
+      dragRef.current = drags;
+      setDrags(drags);
+    },
+    [setDrags]
+  );
 
   const updateLayout = useCallback(
     async (curLayout?: any) => {
@@ -90,6 +121,7 @@ export const useGraph = ({
           type: layoutType,
           graph,
           drags: dragRef.current,
+          clusters: clustersRef?.current,
           clusterAttribute
         });
 
@@ -105,19 +137,36 @@ export const useGraph = ({
         sizingAttribute,
         maxNodeSize,
         minNodeSize,
-        defaultNodeSize
+        defaultNodeSize,
+        clusterAttribute
       });
 
       // Calculate clusters
-      const clusters = calculateClusters({
+      const newClusters = calculateClusters({
         nodes: result.nodes,
         clusterAttribute
       });
 
+      // Do not decrease the cluster size is the number of nodes is the same
+      if (constrainDragging) {
+        newClusters.forEach(cluster => {
+          const prevCluster = clustersRef.current.get(cluster.label);
+          if (prevCluster?.nodes.length === cluster.nodes.length) {
+            cluster.position =
+              clustersRef.current?.get(cluster.label)?.position ??
+              cluster.position;
+          }
+        });
+      }
+
       // Set our store outputs
       setEdges(result.edges);
       setNodes(result.nodes);
-      setClusters(clusters);
+      setClusters(newClusters);
+      if (clusterAttribute) {
+        // Set drag positions for nodes to prevent them from being moved by the layout update
+        updateDrags(result.nodes);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -136,7 +185,18 @@ export const useGraph = ({
     ]
   );
 
+  // Transient updates
   useEffect(() => {
+    dragRef.current = drags;
+  }, [drags, clusterAttribute, updateLayout]);
+
+  // Transient cluster state
+  useEffect(() => {
+    clustersRef.current = clusters;
+  }, [clusters]);
+
+  useEffect(() => {
+    // When the camera position/zoom changes, update the label visibility
     const nodes = stateNodes.map(node => ({
       ...node,
       labelVisible: calcLabelVisibility({
@@ -147,10 +207,12 @@ export const useGraph = ({
       })('node', node?.size)
     }));
 
+    // Determine if the label visibility has changed
     const isVisibilityUpdated = nodes.some(
       (node, i) => node.labelVisible !== stateNodes[i].labelVisible
     );
 
+    // Update the nodes if the label visibility has changed
     if (isVisibilityUpdated) {
       setNodes(nodes);
     }
@@ -176,7 +238,8 @@ export const useGraph = ({
       layoutMounted.current = false;
       buildGraph(graph, visibleNodes, visibleEdges);
       await updateLayout();
-      layoutMounted.current = true;
+      // rqf to prevent race condition
+      requestAnimationFrame(() => (layoutMounted.current = true));
     }
 
     update();
@@ -209,4 +272,8 @@ export const useGraph = ({
       updateLayout(layout.current);
     }
   }, [sizingType, sizingAttribute, labelType, updateLayout]);
+
+  return {
+    updateLayout
+  };
 };

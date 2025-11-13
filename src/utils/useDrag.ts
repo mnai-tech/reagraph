@@ -1,12 +1,15 @@
 import { useThree } from '@react-three/fiber';
+import { useGesture } from '@use-gesture/react';
 import { useMemo } from 'react';
-import { useGesture } from 'react-use-gesture';
-import { Vector2, Vector3, Plane } from 'three';
-import { InternalGraphPosition } from '../types';
+import { Plane, Vector2, Vector3 } from 'three';
+
+import type { InternalGraphPosition } from '../types';
+import type { CenterPositionVector } from '../utils/layout';
 
 interface DragParams {
   draggable: boolean;
   position: InternalGraphPosition;
+  bounds?: CenterPositionVector;
   set: (position: Vector3) => void;
   onDragStart: () => void;
   onDragEnd: () => void;
@@ -16,6 +19,7 @@ export const useDrag = ({
   draggable,
   set,
   position,
+  bounds,
   onDragStart,
   onDragEnd
 }: DragParams) => {
@@ -43,7 +47,9 @@ export const useDrag = ({
 
   const clientRect = useMemo(
     () => gl.domElement.getBoundingClientRect(),
-    [gl.domElement]
+    // Size dependency ensures the clientRect updates when container dimensions change.
+    // Without it, drag calculations would use stale positioning data from the previous container size.
+    [gl.domElement, size]
   );
 
   return useGesture(
@@ -53,7 +59,7 @@ export const useDrag = ({
         const { eventObject, point } = event;
 
         // Save the offset of click point from object origin
-        eventObject.getWorldPosition(offset).sub(point);
+        offset.setFromMatrixPosition(eventObject.matrixWorld).sub(point);
 
         // Set initial 3D cursor position (needed for onDrag plane calculation)
         mouse3D.copy(point);
@@ -61,19 +67,15 @@ export const useDrag = ({
         // Run user callback
         onDragStart();
       },
-      onDrag: ({ event }) => {
+      onDrag: ({ xy, buttons, cancel }) => {
+        // If the left mouse button is not pressed, cancel the drag
+        if (buttons !== 1) {
+          cancel();
+          return;
+        }
         // Compute normalized mouse coordinates (screen space)
-        const scrollX = window.scrollX || window.pageXOffset;
-        const scrollY = window.scrollY || window.pageYOffset;
-
-        const nx =
-          ((event.clientX - (clientRect?.left ?? 0) + scrollX) / size.width) *
-            2 -
-          1;
-        const ny =
-          -((event.clientY - (clientRect?.top ?? 0) + scrollY) / size.height) *
-            2 +
-          1;
+        const nx = ((xy[0] - (clientRect?.left ?? 0)) / size.width) * 2 - 1;
+        const ny = -((xy[1] - (clientRect?.top ?? 0)) / size.height) * 2 + 1;
 
         // Unlike the mouse from useThree, this works offscreen
         mouse2D.set(nx, ny);
@@ -94,6 +96,26 @@ export const useDrag = ({
         const updated = new Vector3(position.x, position.y, position.z)
           .copy(mouse3D)
           .add(offset);
+
+        // If there's a cluster, clamp the position within its circular bounds
+        if (bounds) {
+          const center = new Vector3(
+            (bounds.minX + bounds.maxX) / 2,
+            (bounds.minY + bounds.maxY) / 2,
+            (bounds.minZ + bounds.maxZ) / 2
+          );
+          const radius = (bounds.maxX - bounds.minX) / 2;
+
+          // Calculate direction from center to updated position
+          const direction = updated.clone().sub(center);
+          const distance = direction.length();
+
+          // If outside the circle, clamp to the circle's edge
+          if (distance > radius) {
+            direction.normalize().multiplyScalar(radius);
+            updated.copy(center).add(direction);
+          }
+        }
 
         return set(updated);
       },
