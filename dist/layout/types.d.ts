@@ -1,7 +1,7 @@
+import { default as Graph } from 'graphology';
 import { DragReferences } from '../store';
 import { InternalGraphEdge, InternalGraphNode, InternalGraphPosition } from '../types';
-import Graph from 'graphology';
-export type LayoutTypes = 'forceDirected2d' | 'forceDirected3d' | 'circular2d' | 'treeTd2d' | 'treeTd3d' | 'treeLr2d' | 'treeLr3d' | 'radialOut2d' | 'radialOut3d' | 'hierarchicalTd' | 'hierarchicalLr' | 'nooverlap' | 'forceatlas2' | 'custom';
+export type LayoutTypes = 'forceDirected2d' | 'forceDirected3d' | 'circular2d' | 'concentric2d' | 'concentric3d' | 'treeTd2d' | 'treeTd3d' | 'treeLr2d' | 'treeLr3d' | 'radialOut2d' | 'radialOut3d' | 'hierarchicalTd' | 'hierarchicalLr' | 'nooverlap' | 'forceatlas2' | 'custom';
 export interface NodePositionArgs {
     /**
      * The graphology object. Useful for any graph manipulation.

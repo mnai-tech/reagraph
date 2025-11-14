@@ -1,12 +1,14 @@
-import { FC, ReactNode, Ref } from 'react';
-import { LayoutOverrides, LayoutTypes } from './layout';
-import { NodeContextMenuProps, ContextMenuEvent, GraphEdge, GraphNode, InternalGraphEdge, InternalGraphNode, NodeRenderer, CollapseProps } from './types';
-import { SizingType } from './sizing';
-import { ClusterEventArgs, EdgeArrowPosition, EdgeInterpolation, EdgeLabelPosition } from './symbols';
-import { CenterNodesParams, FitNodesParams } from './CameraControls';
-import { LabelVisibilityType } from './utils';
-import Graph from 'graphology';
 import { ThreeEvent } from '@react-three/fiber';
+import { default as Graph } from 'graphology';
+import { ReactNode, default as React } from 'react';
+import { CenterNodesParams, FitNodesParams } from './CameraControls/useCenterGraph';
+import { LayoutOverrides, LayoutTypes } from './layout';
+import { SizingType } from './sizing';
+import { ClusterEventArgs } from './symbols/Cluster';
+import { EdgeInterpolation, EdgeLabelPosition } from './symbols/Edge';
+import { EdgeArrowPosition } from './symbols/edges/Edge';
+import { ClusterRenderer, CollapseProps, ContextMenuEvent, GraphEdge, GraphNode, InternalGraphEdge, InternalGraphNode, NodeContextMenuProps, NodeRenderer } from './types';
+import { LabelVisibilityType } from './utils/visibility';
 export interface GraphSceneProps {
     /**
      * Type of layout.
@@ -95,13 +97,25 @@ export interface GraphSceneProps {
      */
     draggable?: boolean;
     /**
+     * Constrain dragging to the cluster bounds. Default is `false`.
+     */
+    constrainDragging?: boolean;
+    /**
      * Render a custom node
      */
     renderNode?: NodeRenderer;
     /**
+     * Render a custom cluster
+     */
+    onRenderCluster?: ClusterRenderer;
+    /**
      * Advanced overrides for the layout.
      */
     layoutOverrides?: LayoutOverrides;
+    /**
+     * Whether to aggregate edges with the same source and target.
+     */
+    aggregateEdges?: boolean;
     /**
      * When a node was clicked.
      */
@@ -126,6 +140,10 @@ export interface GraphSceneProps {
      * Triggered after a node was dragged.
      */
     onNodeDragged?: (node: InternalGraphNode) => void;
+    /**
+     * Triggered after a cluster was dragged.
+     */
+    onClusterDragged?: (cluster: ClusterEventArgs) => void;
     /**
      * When a edge context menu happened.
      */
@@ -194,6 +212,4 @@ export interface GraphSceneRef {
      */
     renderScene: () => void;
 }
-export declare const GraphScene: FC<GraphSceneProps & {
-    ref?: Ref<GraphSceneRef>;
-}>;
+export declare const GraphScene: React.ForwardRefExoticComponent<GraphSceneProps & React.RefAttributes<GraphSceneRef>>;

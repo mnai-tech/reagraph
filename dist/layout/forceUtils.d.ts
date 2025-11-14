@@ -1,4 +1,4 @@
-import { InternalGraphEdge, InternalGraphNode } from 'types';
+import { InternalGraphEdge, InternalGraphNode } from '../types';
 export type DagMode = 'lr' | 'rl' | 'td' | 'but' | 'zout' | 'zin' | 'radialin' | 'radialout';
 export interface ForceRadialInputs {
     nodes: InternalGraphNode[];

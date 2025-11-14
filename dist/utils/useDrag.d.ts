@@ -1,11 +1,13 @@
 import { Vector3 } from 'three';
 import { InternalGraphPosition } from '../types';
+import { CenterPositionVector } from '../utils/layout';
 interface DragParams {
     draggable: boolean;
     position: InternalGraphPosition;
+    bounds?: CenterPositionVector;
     set: (position: Vector3) => void;
     onDragStart: () => void;
     onDragEnd: () => void;
 }
-export declare const useDrag: ({ draggable, set, position, onDragStart, onDragEnd }: DragParams) => (...args: any[]) => import("react-use-gesture/dist/types").ReactEventHandlers;
+export declare const useDrag: ({ draggable, set, position, bounds, onDragStart, onDragEnd }: DragParams) => (...args: any[]) => import('@use-gesture/react/dist/declarations/src/types').ReactDOMAttributes;
 export {};

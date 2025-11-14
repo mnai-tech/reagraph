@@ -11,6 +11,7 @@ interface CalcLabelVisibilityArgs {
     labelType: LabelVisibilityType;
     camera?: PerspectiveCamera;
 }
-export declare function calcLabelVisibility({ nodeCount, nodePosition, labelType, camera }: CalcLabelVisibilityArgs): (shape: 'node' | 'edge', size: number) => boolean;
+export declare function calcLabelVisibility({ nodePosition, labelType, camera }: CalcLabelVisibilityArgs): (shape: "node" | "edge", size: number) => boolean;
 export declare function getLabelOffsetByType(offset: number, position: EdgeLabelPosition): number;
+export declare const isServerRender: boolean;
 export {};

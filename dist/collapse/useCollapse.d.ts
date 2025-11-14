@@ -1,4 +1,4 @@
-import { GraphEdge, GraphNode } from 'types';
+import { GraphEdge, GraphNode } from '../types';
 export interface UseCollapseProps {
     /**
      * Current collapsed node ids.

@@ -1,6 +1,6 @@
-import { FC, ReactNode } from 'react';
-import { NodeContextMenuProps, ContextMenuEvent, InternalGraphNode, NodeRenderer, CollapseProps } from '../types';
 import { ThreeEvent } from '@react-three/fiber';
+import { FC, ReactNode } from 'react';
+import { CollapseProps, ContextMenuEvent, InternalGraphNode, NodeContextMenuProps, NodeRenderer } from '../types';
 export interface NodeProps {
     /**
      * The unique identifier for the node.
@@ -22,6 +22,10 @@ export interface NodeProps {
      * Whether the node is draggable.
      */
     draggable?: boolean;
+    /**
+     * Constrain dragging to the cluster bounds.
+     */
+    constrainDragging?: boolean;
     /**
      * The url for the label font.
      */

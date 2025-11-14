@@ -1,5 +1,4 @@
-/// <reference types="react" />
-import CameraControls from 'camera-controls';
+import { default as CameraControls } from 'camera-controls';
 export interface CameraControlsContextProps {
     /**
      * The camera controls object.
@@ -42,6 +41,14 @@ export interface CameraControlsContextProps {
      * A function that pans the camera downwards.
      */
     panDown: () => void;
+    /**
+     * A function that freezes the camera.
+     */
+    freeze: () => void;
+    /**
+     * A function that unfreezes the camera.
+     */
+    unFreeze: () => void;
 }
-export declare const CameraControlsContext: import("react").Context<CameraControlsContextProps>;
+export declare const CameraControlsContext: import('react').Context<CameraControlsContextProps>;
 export declare const useCameraControls: () => CameraControlsContextProps;

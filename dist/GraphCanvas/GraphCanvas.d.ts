@@ -1,10 +1,10 @@
-import { FC, ReactNode, Ref } from 'react';
-import { GraphSceneProps, GraphSceneRef } from './GraphScene';
-import { CameraMode, CameraControlsRef } from './CameraControls';
-import { Theme } from './themes';
-import Graph from 'graphology';
-import { LassoType } from './selection';
-import ThreeCameraControls from 'camera-controls';
+import { default as ThreeCameraControls } from 'camera-controls';
+import { default as Graph } from 'graphology';
+import { ReactNode, default as React } from 'react';
+import { CameraControlsRef, CameraMode } from '../CameraControls';
+import { GraphSceneProps, GraphSceneRef } from '../GraphScene';
+import { LassoType } from '../selection/Lasso';
+import { Theme } from '../themes';
 export interface GraphCanvasProps extends Omit<GraphSceneProps, 'theme'> {
     /**
      * Theme to use for the graph.
@@ -23,6 +23,14 @@ export interface GraphCanvasProps extends Omit<GraphSceneProps, 'theme'> {
      */
     minDistance?: number;
     /**
+     * The minimum zoom level for the camera. Default is 1.
+     */
+    minZoom?: number;
+    /**
+     * The maximum zoom level for the camera. Default is 100.
+     */
+    maxZoom?: number;
+    /**
      * The type of lasso selection.
      */
     lassoType?: LassoType;
@@ -33,7 +41,7 @@ export interface GraphCanvasProps extends Omit<GraphSceneProps, 'theme'> {
     /**
      * Ability to extend Cavas gl options. For example { preserveDrawingBuffer: true }
      */
-    glOptions?: Object;
+    glOptions?: object;
     /**
      * When the canvas had a lasso selection.
      */
@@ -46,6 +54,10 @@ export interface GraphCanvasProps extends Omit<GraphSceneProps, 'theme'> {
      * When the canvas was clicked but didn't hit a node/edge.
      */
     onCanvasClick?: (event: MouseEvent) => void;
+    /**
+     * Whether to aggregate edges with the same source and target.
+     */
+    aggregateEdges?: boolean;
 }
 export type GraphCanvasRef = Omit<GraphSceneRef, 'graph' | 'renderScene'> & Omit<CameraControlsRef, 'controls'> & {
     /**
@@ -61,6 +73,4 @@ export type GraphCanvasRef = Omit<GraphSceneRef, 'graph' | 'renderScene'> & Omit
      */
     exportCanvas: () => string;
 };
-export declare const GraphCanvas: FC<GraphCanvasProps & {
-    ref?: Ref<GraphCanvasRef>;
-}>;
+export declare const GraphCanvas: React.ForwardRefExoticComponent<GraphCanvasProps & React.RefAttributes<GraphCanvasRef>>;

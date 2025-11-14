@@ -10,24 +10,25 @@
  *  - Removed template logic
  */
 export declare function forceInABox(): {
-    (alpha: any): any;
+    (alpha: any): /*elided*/ any;
     initialize(_: any): void;
-    template(x: any): string | any;
+    template(x: any): string | /*elided*/ any;
     groupBy(x: any): (d: any) => any;
-    enableGrouping(x: any): boolean | any;
+    enableGrouping(x: any): boolean | /*elided*/ any;
     strength(x: any): any;
     getLinkStrength(e: any): any;
     id(_: any): (d: any) => any;
-    size(_: any): number[] | any;
-    linkStrengthInterCluster(_: any): number | any;
-    linkStrengthIntraCluster(_: any): number | any;
-    nodes(_: any): any[] | any;
-    links(_: any): any[] | any;
-    forceNodeSize(_: any): (() => any) | any;
-    nodeSize: (_: any) => (() => any) | any;
-    forceCharge(_: any): (() => any) | any;
-    forceLinkDistance(_: any): (() => any) | any;
-    forceLinkStrength(_: any): (() => any) | any;
-    offset(_: any): number[] | any;
+    size(_: any): number[] | /*elided*/ any;
+    linkStrengthInterCluster(_: any): number | /*elided*/ any;
+    linkStrengthIntraCluster(_: any): number | /*elided*/ any;
+    nodes(_: any): any[] | /*elided*/ any;
+    links(_: any): any[] | /*elided*/ any;
+    forceNodeSize(_: any): (() => any) | /*elided*/ any;
+    nodeSize: (_: any) => (() => any) | /*elided*/ any;
+    forceCharge(_: any): (() => any) | /*elided*/ any;
+    forceLinkDistance(_: any): (() => any) | /*elided*/ any;
+    forceLinkStrength(_: any): (() => any) | /*elided*/ any;
+    offset(_: any): number[] | /*elided*/ any;
     getFocis: () => {};
+    setClusters(value: any): /*elided*/ any;
 };

@@ -18,8 +18,13 @@ export interface Theme {
             fontSize?: number;
             maxWidth?: number;
             ellipsis?: number;
-            backgroundColor?: ColorRepresentation;
             borderRadius?: number;
+            backgroundColor?: ColorRepresentation;
+            backgroundOpacity?: number;
+            padding?: number;
+            strokeColor?: ColorRepresentation;
+            strokeWidth?: number;
+            radius?: number;
         };
         subLabel?: {
             color: ColorRepresentation;
@@ -47,6 +52,12 @@ export interface Theme {
             backgroundColor?: ColorRepresentation;
             borderRadius?: number;
         };
+        subLabel?: {
+            color: ColorRepresentation;
+            stroke?: ColorRepresentation;
+            activeColor: ColorRepresentation;
+            fontSize?: number;
+        };
     };
     arrow: {
         fill: ColorRepresentation;
@@ -66,11 +77,18 @@ export interface Theme {
             color: ColorRepresentation;
             stroke?: ColorRepresentation;
             activeColor: ColorRepresentation;
-            fontSize?: number;
             maxWidth?: number;
             ellipsis?: number;
             backgroundColor?: ColorRepresentation;
             borderRadius?: number;
+            /**
+             * Size of the cluster label
+             */
+            fontSize?: number;
+            /**
+             * Offset of the cluster label relative to the default
+             */
+            offset?: [number, number, number];
         };
     };
 }

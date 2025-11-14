@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { SvgProps } from './Svg';
 import { ColorRepresentation } from 'three';
+import { SvgProps } from './Svg';
 export interface SphereWithSvgProps extends SvgProps {
     /**
      * The image to display on the icon.

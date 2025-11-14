@@ -1,6 +1,6 @@
-import Graph from 'graphology';
-import { LayoutStrategy } from './types';
+import { default as Graph } from 'graphology';
 import { InternalGraphEdge, InternalGraphNode } from '../types';
+import { LayoutStrategy } from './types';
 /**
  * Promise based tick helper.
  */

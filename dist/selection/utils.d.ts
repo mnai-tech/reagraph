@@ -1,5 +1,5 @@
+import { default as Graph } from 'graphology';
 import { Theme } from '../themes';
-import Graph from 'graphology';
 export type PathSelectionTypes = 'direct' | 'out' | 'in' | 'all';
 /**
  * Given a graph and a list of node ids, return the adjacent nodes and edges.

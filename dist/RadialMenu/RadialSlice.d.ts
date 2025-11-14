@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode, default as React } from 'react';
 export interface MenuItem {
     /**
      * Label to display on the menu item.

@@ -211,7 +211,7 @@ export const Badge: FC<BadgeProps> = ({
     const estimatedWidth = Math.max(minWidth, contentWidth + padding * 2);
 
     // Scale height based on fontSize
-    const charCount = label.length;
+    const charCount = label?.length;
     const estimatedHeight = Math.max(
       minHeight,
       Math.min(
@@ -226,7 +226,7 @@ export const Badge: FC<BadgeProps> = ({
     };
   }, [
     textSizeCalculations,
-    label.length,
+    label?.length,
     padding,
     icon,
     iconSize,

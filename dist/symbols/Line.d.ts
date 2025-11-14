@@ -1,6 +1,6 @@
-import { FC } from 'react';
-import { Vector3, ColorRepresentation, Curve } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
+import { FC } from 'react';
+import { ColorRepresentation, Curve, Vector3 } from 'three';
 export interface LineProps {
     /**
      * Whether the line should be animated.
@@ -19,6 +19,14 @@ export interface LineProps {
      */
     curve: Curve<Vector3>;
     /**
+     * Whether the line should be dashed.
+     */
+    dashed?: boolean;
+    /**
+     * Dash pattern for the line: [dashSize, gapSize]
+     */
+    dashArray?: [number, number];
+    /**
      * The unique identifier of the line.
      */
     id: string;
@@ -30,6 +38,10 @@ export interface LineProps {
      * The size of the line.
      */
     size?: number;
+    /**
+     * The render order of the line. Useful when edges are rendered on top of each other.
+     */
+    renderOrder?: number;
     /**
      * A function that is called when the line is clicked.
      */
