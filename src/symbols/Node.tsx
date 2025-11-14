@@ -1,30 +1,25 @@
-import React, {
-  FC,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
-import { Group } from 'three';
-import { animationConfig } from '../utils';
-import { useSpring, a } from '@react-spring/three';
-import { Sphere } from './nodes/Sphere';
-import { Label } from './Label';
-import {
-  NodeContextMenuProps,
+import { a, useSpring } from '@react-spring/three';
+import { Html, useCursor } from '@react-three/drei';
+import type { ThreeEvent } from '@react-three/fiber';
+import type { FC, ReactNode } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import type { Group } from 'three';
+
+import { useCameraControls } from '../CameraControls/useCameraControls';
+import { useStore } from '../store';
+import type {
+  CollapseProps,
   ContextMenuEvent,
   InternalGraphNode,
-  NodeRenderer,
-  CollapseProps
+  NodeContextMenuProps,
+  NodeRenderer
 } from '../types';
-import { Html, useCursor } from 'glodrei';
-import { useCameraControls } from '../CameraControls';
-import { useStore } from '../store';
+import { animationConfig } from '../utils';
 import { useDrag } from '../utils/useDrag';
-import { Icon } from './nodes';
 import { useHoverIntent } from '../utils/useHoverIntent';
-import { ThreeEvent } from '@react-three/fiber';
+import { Label } from './Label';
+import { Icon } from './nodes';
+import { Sphere } from './nodes/Sphere';
 
 export interface NodeProps {
   /**
@@ -51,6 +46,11 @@ export interface NodeProps {
    * Whether the node is draggable.
    */
   draggable?: boolean;
+
+  /**
+   * Constrain dragging to the cluster bounds.
+   */
+  constrainDragging?: boolean;
 
   /**
    * The url for the label font.
@@ -118,7 +118,7 @@ export const Node: FC<NodeProps> = ({
   animated,
   disabled,
   id,
-  draggable,
+  draggable = false,
   labelFontUrl,
   contextMenu,
   onClick,
@@ -127,15 +127,18 @@ export const Node: FC<NodeProps> = ({
   onDragged,
   onPointerOut,
   onContextMenu,
-  renderNode
+  renderNode,
+  constrainDragging
 }) => {
   const cameraControls = useCameraControls();
   const theme = useStore(state => state.theme);
   const node = useStore(state => state.nodes.find(n => n.id === id));
   const edges = useStore(state => state.edges);
-  const draggingId = useStore(state => state.draggingId);
+  const draggingIds = useStore(state => state.draggingIds);
   const collapsedNodeIds = useStore(state => state.collapsedNodeIds);
-  const setDraggingId = useStore(state => state.setDraggingId);
+  const addDraggingId = useStore(state => state.addDraggingId);
+  const removeDraggingId = useStore(state => state.removeDraggingId);
+  const setHoveredNodeId = useStore(state => state.setHoveredNodeId);
   const setNodePosition = useStore(state => state.setNodePosition);
   const setCollapsedNodeIds = useStore(state => state.setCollapsedNodeIds);
   const isCollapsed = useStore(state => state.collapsedNodeIds.includes(id));
@@ -143,8 +146,11 @@ export const Node: FC<NodeProps> = ({
   const isSelected = useStore(state => state.selections?.includes(id));
   const hasSelections = useStore(state => state.selections?.length > 0);
   const center = useStore(state => state.centerPosition);
+  const cluster = useStore(state => state.clusters.get(node.cluster));
 
-  const isDragging = draggingId === id;
+  const isDraggingCurrent = draggingIds.includes(id);
+  const isDragging = draggingIds.length > 0;
+
   const {
     position,
     label,
@@ -182,7 +188,7 @@ export const Node: FC<NodeProps> = ({
     }
   }, [canCollapse, collapsedNodeIds, id, isCollapsed, setCollapsedNodeIds]);
 
-  const [{ nodePosition, labelPosition, subLabelPosition }] = useSpring(
+  const [{ nodePosition, labelPosition }] = useSpring(
     () => ({
       from: {
         nodePosition: center ? [center.x, center.y, 0] : [0, 0, 0],
@@ -192,62 +198,65 @@ export const Node: FC<NodeProps> = ({
       to: {
         nodePosition: position
           ? [
-            position.x,
-            position.y,
-            shouldHighlight ? position.z + 50 : position.z
-          ]
+              position.x,
+              position.y,
+              shouldHighlight ? position.z + 50 : position.z
+            ]
           : [0, 0, 0],
         labelPosition: [0, -(nodeSize + 4), 2],
         subLabelPosition: [0, -(nodeSize + 14), 2]
       },
       config: {
         ...animationConfig,
-        duration: animated && !draggingId ? undefined : 0
+        duration: animated && !isDragging ? undefined : 0
       }
     }),
-    [isDragging, position, animated, nodeSize, shouldHighlight]
+    [isDraggingCurrent, position, animated, nodeSize, shouldHighlight]
   );
 
   const bind = useDrag({
     draggable,
     position,
+    // If dragging is constrained to the cluster, use the cluster's position as the bounds
+    bounds: constrainDragging ? cluster?.position : undefined,
     // @ts-ignore
     set: pos => setNodePosition(id, pos),
     onDragStart: () => {
-      setDraggingId(id);
+      addDraggingId(id);
       setActive(true);
     },
     onDragEnd: () => {
-      setDraggingId(null);
-      setActive(false);
+      removeDraggingId(id);
       onDragged?.(node);
     }
   });
 
-  useCursor(active && !draggingId && onClick !== undefined, 'pointer');
+  useCursor(active && !isDragging && onClick !== undefined, 'pointer');
   useCursor(
-    active && draggable && !isDragging && onClick === undefined,
+    active && draggable && !isDraggingCurrent && onClick === undefined,
     'grab'
   );
-  useCursor(isDragging, 'grabbing');
+  useCursor(isDraggingCurrent, 'grabbing');
 
-  const combinedActiveState = shouldHighlight || isDragging;
+  const combinedActiveState = shouldHighlight || isDraggingCurrent;
   const color = combinedActiveState
     ? node.activeFill || theme.node.activeFill
     : node.fill || theme.node.fill;
 
   const actualShowRing = node.showRing;
   const { pointerOver, pointerOut } = useHoverIntent({
-    disabled: disabled || isDragging,
+    disabled: disabled || isDraggingCurrent,
     onPointerOver: (event: ThreeEvent<PointerEvent>) => {
-      cameraControls.controls.truckSpeed = 0;
+      cameraControls.freeze();
       setActive(true);
       onPointerOver?.(node, event);
+      setHoveredNodeId(id);
     },
     onPointerOut: (event: ThreeEvent<PointerEvent>) => {
-      cameraControls.controls.truckSpeed = 2.0;
+      cameraControls.unFreeze();
       setActive(false);
       onPointerOut?.(node, event);
+      setHoveredNodeId(null);
     }
   });
 
@@ -332,7 +341,7 @@ export const Node: FC<NodeProps> = ({
             />
           </a.group>
           {subLabel && (
-            <a.group position={subLabelPosition as any}>
+            <group position={[0, -(nodeSize - 3), 0]}>
               <Label
                 text={subLabel}
                 fontUrl={labelFontUrl}
@@ -343,33 +352,39 @@ export const Node: FC<NodeProps> = ({
                 borderRadius={theme.node.label.borderRadius}
                 opacity={selectionOpacity}
                 stroke={theme.node.subLabel?.stroke}
-                active={isSelected || active || isDragging || isActive}
+                active={isSelected || active || isDraggingCurrent || isActive}
                 color={
-                  isSelected || active || isDragging || isActive
+                  isSelected || active || isDraggingCurrent || isActive
                     ? theme.node.subLabel?.activeColor
                     : theme.node.subLabel?.color
                 }
                 labelVisible={labelVisible}
               />
-            </a.group>
+            </group>
           )}
         </>
       ),
     [
       active,
       isActive,
-      isDragging,
+      isDraggingCurrent,
       isSelected,
       label,
       labelFontUrl,
       labelPosition,
       labelVisible,
+      nodeSize,
       selectionOpacity,
       subLabel,
-      subLabelPosition,
       theme.node.label.activeColor,
       theme.node.label.color,
       theme.node.label.stroke,
+      theme.node.label.backgroundColor,
+      theme.node.label.backgroundOpacity,
+      theme.node.label.padding,
+      theme.node.label.strokeColor,
+      theme.node.label.strokeWidth,
+      theme.node.label.radius,
       theme.node.subLabel?.activeColor,
       theme.node.subLabel?.color,
       theme.node.subLabel?.stroke,
@@ -407,7 +422,7 @@ export const Node: FC<NodeProps> = ({
       onPointerOver={pointerOver}
       onPointerOut={pointerOut}
       onClick={(event: ThreeEvent<MouseEvent>) => {
-        if (!disabled && !isDragging) {
+        if (!disabled && !isDraggingCurrent) {
           onClick?.(
             node,
             {
@@ -420,7 +435,7 @@ export const Node: FC<NodeProps> = ({
       }}
       onDoubleClick={(event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation();
-        if (!disabled && !isDragging) {
+        if (!disabled && !isDraggingCurrent) {
           onDoubleClick?.(node, event);
         }
       }}
@@ -441,8 +456,4 @@ export const Node: FC<NodeProps> = ({
       {labelComponent}
     </a.group>
   );
-};
-
-Node.defaultProps = {
-  draggable: false
 };

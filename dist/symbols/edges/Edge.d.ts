@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, default as React } from 'react';
 import { ColorRepresentation } from 'three';
 import { ContextMenuEvent, InternalGraphEdge } from '../../types';
 /**
@@ -44,5 +44,9 @@ export interface EdgeProps {
      * The opacity of the edge.
      */
     opacity?: number;
+    /**
+     * Whether the edge is active.
+     */
+    active?: boolean;
 }
 export declare const Edge: FC<EdgeProps>;

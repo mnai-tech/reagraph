@@ -1,6 +1,6 @@
-import { FC, Ref, ReactNode } from 'react';
+import { ReactNode, default as React } from 'react';
 import { CameraControlsContextProps } from './useCameraControls';
-export type CameraMode = 'pan' | 'rotate' | 'orbit';
+export type CameraMode = 'pan' | 'rotate' | 'orbit' | 'orthographic';
 export interface CameraControlsProps {
     /**
      * Mode of the camera.
@@ -19,15 +19,21 @@ export interface CameraControlsProps {
      */
     disabled?: boolean;
     /**
-     * The maximum distance for the camera.
+     * The maximum distance for the camera (perspective mode).
      */
     maxDistance?: number;
     /**
-     * The minimum distance for the camera.
+     * The minimum distance for the camera (perspective mode).
      */
     minDistance?: number;
+    /**
+     * The maximum zoom level for orthographic cameras.
+     */
+    maxZoom?: number;
+    /**
+     * The minimum zoom level for orthographic cameras.
+     */
+    minZoom?: number;
 }
 export type CameraControlsRef = CameraControlsContextProps;
-export declare const CameraControls: FC<CameraControlsProps & {
-    ref?: Ref<CameraControlsRef>;
-}>;
+export declare const CameraControls: React.ForwardRefExoticComponent<CameraControlsProps & React.RefAttributes<CameraControlsContextProps>>;

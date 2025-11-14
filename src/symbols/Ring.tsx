@@ -1,8 +1,11 @@
-import React, { FC, useMemo } from 'react';
-import { Color, ColorRepresentation, DoubleSide } from 'three';
+import { a, useSpring } from '@react-spring/three';
+import { Billboard } from '@react-three/drei';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
+import type { ColorRepresentation } from 'three';
+import { Color, DoubleSide } from 'three';
+
 import { animationConfig } from '../utils/animation';
-import { useSpring, a } from '@react-spring/three';
-import { Billboard } from 'glodrei';
 
 export interface RingProps {
   /**
@@ -44,9 +47,9 @@ export interface RingProps {
 }
 
 export const Ring: FC<RingProps> = ({
-  color,
-  size,
-  opacity,
+  color = '#D8E6EA',
+  size = 1,
+  opacity = 0.5,
   animated,
   strokeWidth,
   innerRadius = 2,
@@ -74,7 +77,12 @@ export const Ring: FC<RingProps> = ({
 
   return (
     <Billboard position={[0, 0, 1]}>
-      <a.mesh scale={ringSize as any}>
+      <a.mesh
+        scale={ringSize as any}
+        // Disabling raycast/pointer events when ring is invisible (opacity = 0)
+        // This prevents invisible rings highlighting parent nodes when hovered over
+        raycast={opacity > 0 ? undefined : () => []}
+      >
         <ringGeometry
           attach="geometry"
           args={[innerRadius, outerRadius, segments]}
@@ -91,11 +99,4 @@ export const Ring: FC<RingProps> = ({
       </a.mesh>
     </Billboard>
   );
-};
-
-Ring.defaultProps = {
-  color: '#D8E6EA',
-  size: 1,
-  opacity: 0.5,
-  strokeWidth: 5
 };

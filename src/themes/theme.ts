@@ -1,4 +1,4 @@
-import { ColorRepresentation } from 'three';
+import type { ColorRepresentation } from 'three';
 
 export interface Theme {
   canvas?: {
@@ -19,8 +19,13 @@ export interface Theme {
       fontSize?: number;
       maxWidth?: number;
       ellipsis?: number;
-      backgroundColor?: ColorRepresentation;
       borderRadius?: number;
+      backgroundColor?: ColorRepresentation;
+      backgroundOpacity?: number;
+      padding?: number;
+      strokeColor?: ColorRepresentation;
+      strokeWidth?: number;
+      radius?: number;
     };
     subLabel?: {
       color: ColorRepresentation;
@@ -28,10 +33,7 @@ export interface Theme {
       activeColor: ColorRepresentation;
     };
   };
-  ring: {
-    fill: ColorRepresentation;
-    activeFill: ColorRepresentation;
-  };
+  ring: { fill: ColorRepresentation; activeFill: ColorRepresentation };
   edge: {
     fill: ColorRepresentation;
     activeFill: ColorRepresentation;
@@ -48,15 +50,15 @@ export interface Theme {
       backgroundColor?: ColorRepresentation;
       borderRadius?: number;
     };
+    subLabel?: {
+      color: ColorRepresentation;
+      stroke?: ColorRepresentation;
+      activeColor: ColorRepresentation;
+      fontSize?: number;
+    };
   };
-  arrow: {
-    fill: ColorRepresentation;
-    activeFill: ColorRepresentation;
-  };
-  lasso: {
-    background: string;
-    border: string;
-  };
+  arrow: { fill: ColorRepresentation; activeFill: ColorRepresentation };
+  lasso: { background: string; border: string };
   cluster?: {
     stroke?: ColorRepresentation;
     fill?: ColorRepresentation;
@@ -67,11 +69,18 @@ export interface Theme {
       color: ColorRepresentation;
       stroke?: ColorRepresentation;
       activeColor: ColorRepresentation;
-      fontSize?: number;
       maxWidth?: number;
       ellipsis?: number;
       backgroundColor?: ColorRepresentation;
       borderRadius?: number;
+      /**
+       * Size of the cluster label
+       */
+      fontSize?: number;
+      /**
+       * Offset of the cluster label relative to the default
+       */
+      offset?: [number, number, number];
     };
   };
 }

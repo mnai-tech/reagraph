@@ -1,5 +1,5 @@
+import { LayoutTypes } from '../layout/types';
 import { InternalGraphNode } from '../types';
-import { LayoutTypes } from 'layout/types';
 export interface CenterNodesParams {
     animated?: boolean;
     centerOnlyIfNodesNotInView?: boolean;

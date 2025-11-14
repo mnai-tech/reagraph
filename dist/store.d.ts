@@ -1,10 +1,10 @@
-/// <reference types="react" />
-import { StoreApi } from 'zustand';
-import { InternalGraphEdge, InternalGraphNode, InternalGraphPosition } from './types';
+import { default as Graph } from 'graphology';
+import { FC, ReactNode } from 'react';
 import { BufferGeometry, Mesh } from 'three';
-import { CenterPositionVector, ClusterGroup } from './utils';
-import Graph from 'graphology';
+import { StoreApi } from 'zustand';
 import { Theme } from './themes';
+import { InternalGraphEdge, InternalGraphNode, InternalGraphPosition } from './types';
+import { CenterPositionVector, ClusterGroup } from './utils';
 export type DragReferences = {
     [key: string]: InternalGraphNode;
 };
@@ -17,11 +17,13 @@ export interface GraphState {
     centerPosition?: CenterPositionVector;
     actives?: string[];
     selections?: string[];
+    hoveredNodeId?: string;
+    hoveredEdgeIds?: string[];
     edgeContextMenus?: Set<string>;
     setEdgeContextMenus: (edges: Set<string>) => void;
     edgeMeshes: Array<Mesh<BufferGeometry>>;
     setEdgeMeshes: (edgeMeshes: Array<Mesh<BufferGeometry>>) => void;
-    draggingId?: string | null;
+    draggingIds?: string[];
     drags?: DragReferences;
     panning?: boolean;
     theme: Theme;
@@ -29,20 +31,22 @@ export interface GraphState {
     setClusters: (clusters: Map<string, ClusterGroup>) => void;
     setPanning: (panning: boolean) => void;
     setDrags: (drags: DragReferences) => void;
-    setDraggingId: (id: string | null) => void;
+    addDraggingId: (id: string) => void;
+    removeDraggingId: (id: string) => void;
     setActives: (actives: string[]) => void;
     setSelections: (selections: string[]) => void;
+    setHoveredNodeId: (hoveredNodeId: string | null) => void;
+    setHoveredEdgeIds: (hoveredEdgeIds: string[] | null) => void;
     setNodes: (nodes: InternalGraphNode[]) => void;
     setEdges: (edges: InternalGraphEdge[]) => void;
     setNodePosition: (id: string, position: InternalGraphPosition) => void;
     setCollapsedNodeIds: (nodeIds: string[]) => void;
     canvasRef: HTMLCanvasElement | null;
+    setClusterPosition: (id: string, position: CenterPositionVector) => void;
 }
-export declare const Provider: ({ createStore, children, }: {
-    createStore: () => StoreApi<GraphState>;
-    children: import("react").ReactNode;
-}) => import("react").FunctionComponentElement<import("react").ProviderProps<StoreApi<GraphState>>>, useStore: {
-    (): GraphState;
-    <U>(selector: (state: GraphState) => U, equalityFn?: (a: U, b: U) => boolean): U;
-};
-export declare const createStore: ({ actives, selections, collapsedNodeIds, theme, canvasRef }: Partial<GraphState>) => import("zustand").UseBoundStore<StoreApi<GraphState>>;
+export declare const createStore: ({ actives, selections, collapsedNodeIds, theme, canvasRef }: Partial<GraphState>) => import('zustand').UseBoundStore<StoreApi<GraphState>>;
+export declare const Provider: FC<{
+    children: ReactNode;
+    store?: StoreApi<GraphState>;
+}>;
+export declare const useStore: <T>(selector: (state: GraphState) => T) => T;

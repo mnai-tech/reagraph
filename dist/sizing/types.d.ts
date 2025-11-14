@@ -1,4 +1,4 @@
-import Graph from 'graphology';
+import { default as Graph } from 'graphology';
 export interface SizingStrategyInputs {
     /**
      * The graph object.

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, default as React } from 'react';
 import { MenuItem } from './RadialSlice';
 interface RadialMenuProps {
     /**

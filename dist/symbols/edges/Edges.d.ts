@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import { FC, default as React } from 'react';
 import { ContextMenuEvent, InternalGraphEdge } from '../../types';
 import { EdgeArrowPosition } from '../Arrow';
-import { EdgeLabelPosition, EdgeInterpolation } from '../Edge';
+import { EdgeInterpolation, EdgeLabelPosition } from '../Edge';
 import { EdgeEvents } from './useEdgeEvents';
 export type EdgesProps = {
     /**

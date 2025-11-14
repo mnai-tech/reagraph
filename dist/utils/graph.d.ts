@@ -1,12 +1,12 @@
-import Graph from 'graphology';
+import { default as Graph } from 'graphology';
+import { LayoutStrategy } from '../layout';
 import { SizingType } from '../sizing';
 import { GraphEdge, GraphNode, InternalGraphEdge, InternalGraphNode } from '../types';
 import { LabelVisibilityType } from './visibility';
-import { LayoutStrategy } from '../layout';
 /**
  * Initialize the graph with the nodes/edges.
  */
-export declare function buildGraph(graph: Graph, nodes: GraphNode[], edges: GraphEdge[]): Graph<import("graphology-types").Attributes, import("graphology-types").Attributes, import("graphology-types").Attributes>;
+export declare function buildGraph(graph: Graph, nodes: GraphNode[], edges: GraphEdge[]): Graph<import('graphology-types').Attributes, import('graphology-types').Attributes, import('graphology-types').Attributes>;
 interface TransformGraphInput {
     graph: Graph;
     layout: LayoutStrategy;
@@ -16,11 +16,12 @@ interface TransformGraphInput {
     minNodeSize?: number;
     maxNodeSize?: number;
     defaultNodeSize?: number;
+    clusterAttribute?: string;
 }
 /**
  * Transform the graph into a format that is easier to work with.
  */
-export declare function transformGraph({ graph, layout, sizingType, labelType, sizingAttribute, defaultNodeSize, minNodeSize, maxNodeSize }: TransformGraphInput): {
+export declare function transformGraph({ graph, layout, sizingType, labelType, sizingAttribute, defaultNodeSize, minNodeSize, maxNodeSize, clusterAttribute }: TransformGraphInput): {
     nodes: InternalGraphNode[];
     edges: InternalGraphEdge[];
 };

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
+import type { BufferGeometry, Curve } from 'three';
 import {
-  BoxGeometry,
-  BufferGeometry,
+  Color,
   CylinderGeometry,
   Quaternion,
   TubeGeometry,
@@ -9,16 +9,21 @@ import {
 } from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
 
-import { GraphState, useStore } from '../../store';
-import { InternalGraphEdge } from '../../types';
+import type { GraphState } from '../../store';
+import { useStore } from '../../store';
+import type { InternalGraphEdge } from '../../types';
 import {
+  addColorAttribute,
+  createDashedGeometry,
+  createNullGeometry,
   getArrowSize,
   getArrowVectors,
-  getVector,
-  getCurve
+  getCurve,
+  getSelfLoopCurve,
+  getVector
 } from '../../utils';
-import { EdgeArrowPosition } from '../Arrow';
-import { EdgeInterpolation } from '../Edge';
+import type { EdgeArrowPosition } from '../Arrow';
+import type { EdgeInterpolation } from '../Edge';
 
 export type UseEdgeGeometry = {
   getGeometries(edges: Array<InternalGraphEdge>): Array<BufferGeometry>;
@@ -28,7 +33,7 @@ export type UseEdgeGeometry = {
   ): BufferGeometry;
 };
 
-const NULL_GEOMETRY = new BoxGeometry(0, 0, 0);
+const NULL_GEOMETRY = createNullGeometry();
 
 export function useEdgeGeometry(
   arrowPlacement: EdgeArrowPosition,
@@ -37,7 +42,7 @@ export function useEdgeGeometry(
   // We don't want to rerun everything when the state changes,
   // but we do want to use the most recent nodes whenever `getGeometries`
   // or `getGeometry` is run, so we store it in a ref:
-  const stateRef = useRef<GraphState>();
+  const stateRef = useRef<GraphState | null>(null);
   const theme = useStore(state => state.theme);
   useStore(state => {
     stateRef.current = state;
@@ -45,70 +50,127 @@ export function useEdgeGeometry(
 
   const geometryCacheRef = useRef(new Map<string, BufferGeometry>());
 
-  const curved = interpolation === 'curved';
+  // Add memoized geometry for arrows
+  const baseArrowGeometryRef = useRef<CylinderGeometry | null>(null);
+
   const getGeometries = useCallback(
     (edges: Array<InternalGraphEdge>): Array<BufferGeometry> => {
       const geometries: Array<BufferGeometry> = [];
       const cache = geometryCacheRef.current;
 
+      // Pre-compute values outside the loop
       const { nodes } = stateRef.current;
+      const nodesMap = new Map(nodes.map(node => [node.id, node]));
+
+      // Initialize base arrow geometry if needed
+      if (arrowPlacement !== 'none' && !baseArrowGeometryRef.current) {
+        baseArrowGeometryRef.current = new CylinderGeometry(
+          0,
+          1,
+          1,
+          20,
+          1,
+          true
+        );
+      }
 
       edges.forEach(edge => {
         const { target, source, size = 1 } = edge;
-
-        const from = nodes.find(node => node.id === source);
-        const to = nodes.find(node => node.id === target);
+        const from = nodesMap.get(source);
+        const to = nodesMap.get(target);
 
         if (!from || !to) {
           return;
         }
+        // Improved hash function to include size
+        const hash = `${from.position.x},${from.position.y},${to.position.x},${to.position.y},${size}`;
 
-        // Create hash so geometry can be reused if edge doesn't move:
-        const hash = `fromX:${from.position.x},fromY:${from.position.y},toX:${to.position.x}},toY:${to.position.y}`;
+        // Detect self-loop
+        const isSelfLoop = from.id === to.id;
+        // Determine interpolation for this specific edge
+        const edgeInterpolation = edge.interpolation || interpolation;
+        const curved = edgeInterpolation === 'curved';
+
+        // Determine arrow placement for this specific edge
+        const edgeArrowPlacement = edge.arrowPlacement || arrowPlacement;
+
         if (cache.has(hash)) {
-          const geometry = cache.get(hash);
-          geometries.push(geometry);
+          geometries.push(cache.get(hash));
           return;
         }
-
         const fromVector = getVector(from);
-        const fromOffset = from.size + theme.edge.label.fontSize;
+        const fromOffset = from.size;
         const toVector = getVector(to);
-        const toOffset = to.size + theme.edge.label.fontSize;
-        let curve = getCurve(
-          fromVector,
-          fromOffset,
-          toVector,
-          toOffset,
-          curved
-        );
+        const toOffset = to.size;
 
-        let edgeGeometry = new TubeGeometry(curve, 20, size / 2, 5, false);
+        let curve: Curve<Vector3>;
+        if (isSelfLoop) {
+          // Self-loop curve
+          curve = getSelfLoopCurve(from);
+        } else {
+          // Regular edge curve
+          curve = getCurve(fromVector, fromOffset, toVector, toOffset, curved);
+        }
 
-        if (arrowPlacement === 'none') {
+        // Use smaller radius for dashed edges to match Line.tsx behavior
+        const isDashedEdge = edge.dashed;
+        const radius = isDashedEdge ? size * 0.4 : size / 2;
+
+        let edgeGeometry: BufferGeometry;
+        if (isDashedEdge) {
+          edgeGeometry = createDashedGeometry(
+            curve,
+            radius,
+            new Color(edge.fill ?? theme.edge.fill),
+            edge.dashArray
+          );
+        } else {
+          edgeGeometry = new TubeGeometry(curve, 20, radius, 5, false);
+        }
+
+        if (edgeArrowPlacement === 'none') {
+          // Add color to edge geometry for edges without arrows (only if not dashed, dashed already have colors)
+          if (!isDashedEdge) {
+            const edgeOnlyColor = new Color(edge.fill ?? theme.edge.fill);
+            addColorAttribute(edgeGeometry, edgeOnlyColor);
+          }
+
           geometries.push(edgeGeometry);
           cache.set(hash, edgeGeometry);
           return;
         }
 
+        // Reuse base arrow geometry and scale/rotate as needed
         const [arrowLength, arrowSize] = getArrowSize(size);
+        const arrowGeometry = baseArrowGeometryRef.current.clone();
+        arrowGeometry.scale(arrowSize, arrowLength, arrowSize);
 
-        const [arrowPosition, arrowRotation] = getArrowVectors(
-          arrowPlacement,
-          curve,
-          arrowLength
-        );
+        let arrowPosition: Vector3;
+        let arrowRotation: Vector3;
+
+        if (isSelfLoop) {
+          // Arrow positioning for self-loop
+          const uEnd = 0.58;
+          const uMid = 0.25;
+          if (edgeArrowPlacement === 'mid') {
+            arrowPosition = curve.getPointAt(uMid);
+            arrowRotation = curve.getTangentAt(uMid);
+          } else {
+            // end is default
+            arrowPosition = curve.getPointAt(uEnd);
+            arrowRotation = curve.getTangentAt(uEnd);
+          }
+        } else {
+          // Regular arrow positioning
+          [arrowPosition, arrowRotation] = getArrowVectors(
+            edgeArrowPlacement,
+            curve,
+            arrowLength
+          );
+        }
+
         const quaternion = new Quaternion();
         quaternion.setFromUnitVectors(new Vector3(0, 1, 0), arrowRotation);
-
-        const arrowGeometry = new CylinderGeometry(
-          0,
-          arrowSize,
-          arrowLength,
-          20,
-          1,
-          true
-        );
         arrowGeometry.applyQuaternion(quaternion);
         arrowGeometry.translate(
           arrowPosition.x,
@@ -117,24 +179,49 @@ export function useEdgeGeometry(
         );
 
         // Move edge so it doesn't stick through the arrow:
-        if (arrowPlacement && arrowPlacement === 'end') {
-          const curve = getCurve(
+        if (edgeArrowPlacement && edgeArrowPlacement === 'end' && !isSelfLoop) {
+          const adjustedCurve = getCurve(
             fromVector,
             fromOffset,
             arrowPosition,
             0,
             curved
           );
-          edgeGeometry = new TubeGeometry(curve, 20, size / 2, 5, false);
+
+          if (isDashedEdge) {
+            edgeGeometry = createDashedGeometry(
+              adjustedCurve,
+              radius,
+              new Color(edge.fill ?? theme.edge.fill),
+              edge.dashArray
+            );
+          } else {
+            edgeGeometry = new TubeGeometry(
+              adjustedCurve,
+              20,
+              radius,
+              5,
+              false
+            );
+          }
         }
 
+        // Add color attributes to both geometries (only for non-dashed, dashed already have colors)
+        const finalColor = new Color(edge.fill ?? theme.edge.fill);
+
+        if (!isDashedEdge) {
+          addColorAttribute(edgeGeometry, finalColor);
+        }
+        addColorAttribute(arrowGeometry, finalColor);
+
         const merged = mergeBufferGeometries([edgeGeometry, arrowGeometry]);
+        merged.userData = { ...merged.userData, type: 'edge' };
         geometries.push(merged);
         cache.set(hash, merged);
       });
       return geometries;
     },
-    [arrowPlacement, curved, theme.edge.label.fontSize]
+    [arrowPlacement, interpolation, theme.edge.fill]
   );
 
   const getGeometry = useCallback(

@@ -1,8 +1,11 @@
-import React, { FC, useLayoutEffect, useMemo, useRef } from 'react';
-import { RadialSlice, MenuItem } from './RadialSlice';
-import { calculateRadius } from './utils';
-import css from './RadialMenu.module.css';
 import classNames from 'classnames';
+import type { FC } from 'react';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
+
+import css from './RadialMenu.module.css';
+import type { MenuItem } from './RadialSlice';
+import { RadialSlice } from './RadialSlice';
+import { calculateRadius } from './utils';
 
 interface RadialMenuProps {
   /**
@@ -39,10 +42,10 @@ interface RadialMenuProps {
 
 export const RadialMenu: FC<RadialMenuProps> = ({
   items,
-  radius,
+  radius = 175,
   className,
-  innerRadius,
-  startOffsetAngle,
+  innerRadius = 25,
+  startOffsetAngle = 0,
   onClose
 }) => {
   const { centralAngle, polar, startAngle, deltaAngle } = useMemo(
@@ -89,10 +92,4 @@ export const RadialMenu: FC<RadialMenuProps> = ({
       ))}
     </div>
   );
-};
-
-RadialMenu.defaultProps = {
-  radius: 175,
-  innerRadius: 25,
-  startOffsetAngle: 0
 };

@@ -1,5 +1,7 @@
-import { ReactNode } from 'react';
-import { ColorRepresentation } from 'three';
+import type { ReactNode } from 'react';
+import type { ColorRepresentation } from 'three';
+
+import type { Theme } from './themes';
 
 export interface GraphElementBaseAttributes<T = any> {
   /**
@@ -62,6 +64,26 @@ export interface GraphNode extends GraphElementBaseAttributes {
    * Active Fill color for the node.
    */
   activeFill?: string;
+
+  /**
+   * Cluster ID for the node.
+   */
+  cluster?: string;
+
+  /**
+   * Fixed X position for force-directed layouts.
+   */
+  fx?: number;
+
+  /**
+   * Fixed Y position for force-directed layouts.
+   */
+  fy?: number;
+
+  /**
+   * Fixed Z position for force-directed layouts.
+   */
+  fz?: number;
 }
 
 export interface GraphEdge extends GraphElementBaseAttributes {
@@ -71,9 +93,43 @@ export interface GraphEdge extends GraphElementBaseAttributes {
   source: string;
 
   /**
+   * Fill color for the edge.
+   */
+  fill?: string;
+
+  /**
    * Target ID of the node.
    */
   target: string;
+
+  /**
+   * Whether the edge should be rendered with a dashed line pattern.
+   * When true, the edge will display with alternating dash and gap segments.
+   * Default is false (solid line).
+   */
+  dashed?: boolean;
+
+  /**
+   * Dash pattern for the line: [dashSize, gapSize]
+   */
+  dashArray?: [number, number];
+
+  /**
+   * Placement of the subLabel relative to the main label.
+   * - 'below': Show subLabel below the main label (default)
+   * - 'above': Show subLabel above the main label
+   */
+  subLabelPlacement?: 'below' | 'above';
+
+  /**
+   * Type of edge interpolation ('linear' | 'curved'). Default is 'linear'.
+   */
+  interpolation?: 'linear' | 'curved';
+
+  /**
+   * Placement of the edge arrow ('none' | 'mid' | 'end'). Default is 'end'.
+   */
+  arrowPlacement?: 'none' | 'mid' | 'end';
 }
 
 export interface Graph {
@@ -273,3 +329,59 @@ export interface NodeRendererProps {
 }
 
 export type NodeRenderer = (args: NodeRendererProps) => ReactNode;
+
+export interface ClusterLabel {
+  /**
+   * Position of the label.
+   */
+  position: [number, number, number];
+
+  /**
+   * Text of the label.
+   */
+  text: string;
+
+  /**
+   * Opacity of the label.
+   */
+  opacity?: number;
+
+  /**
+   * Font URL of the label.
+   */
+  fontUrl?: string;
+}
+
+export interface ClusterRendererProps {
+  /**
+   * Outer radius of the cluster.
+   */
+  outerRadius: number;
+
+  /**
+   * Inner radius of the cluster.
+   */
+  innerRadius: number;
+
+  /**
+   * Padding of the cluster.
+   */
+  padding: number;
+
+  /**
+   * Opacity of the cluster.
+   */
+  opacity: number;
+
+  /**
+   * Label of the cluster.
+   */
+  label?: ClusterLabel;
+
+  /**
+   * Theme of the graph.
+   */
+  theme?: Theme;
+}
+
+export type ClusterRenderer = (args: ClusterRendererProps) => ReactNode;

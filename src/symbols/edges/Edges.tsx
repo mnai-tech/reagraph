@@ -1,19 +1,22 @@
-import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { a } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
-import { DoubleSide, Mesh, Raycaster, TubeGeometry } from 'three';
+import type { FC } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { Raycaster, TubeGeometry } from 'three';
+import { DoubleSide, Mesh } from 'three';
 
 import { useStore } from '../../store';
-import { ContextMenuEvent, InternalGraphEdge } from '../../types';
-import { EdgeArrowPosition } from '../Arrow';
-import { EdgeLabelPosition, EdgeInterpolation } from '../Edge';
-import { useEdgeGeometry } from './useEdgeGeometry';
-import { EdgeEvents, useEdgeEvents } from './useEdgeEvents';
-import {
-  useEdgePositionAnimation,
-  useEdgeOpacityAnimation
-} from './useEdgeAnimations';
+import type { ContextMenuEvent, InternalGraphEdge } from '../../types';
+import type { EdgeArrowPosition } from '../Arrow';
+import type { EdgeInterpolation, EdgeLabelPosition } from '../Edge';
 import { Edge } from './Edge';
+import {
+  useEdgeOpacityAnimation,
+  useEdgePositionAnimation
+} from './useEdgeAnimations';
+import type { EdgeEvents } from './useEdgeEvents';
+import { useEdgeEvents } from './useEdgeEvents';
+import { useEdgeGeometry } from './useEdgeGeometry';
 
 export type EdgesProps = {
   /**
@@ -101,11 +104,12 @@ export const Edges: FC<EdgesProps> = ({
     interpolation
   );
 
-  const draggingId = useStore(state => state.draggingId);
+  const draggingIds = useStore(state => state.draggingIds);
   const edgeMeshes = useStore(state => state.edgeMeshes);
   const setEdgeMeshes = useStore(state => state.setEdgeMeshes);
   const actives = useStore(state => state.actives || []);
   const selections = useStore(state => state.selections || []);
+  const hoveredEdgeIds = useStore(state => state.hoveredEdgeIds || []);
 
   const [active, inactive, draggingActive, draggingInactive] = useMemo(() => {
     const active: Array<InternalGraphEdge> = [];
@@ -113,8 +117,15 @@ export const Edges: FC<EdgesProps> = ({
     const draggingActive: Array<InternalGraphEdge> = [];
     const draggingInactive: Array<InternalGraphEdge> = [];
     edges.forEach(edge => {
-      if (draggingId === edge.source || draggingId === edge.target) {
-        if (selections.includes(edge.id) || actives.includes(edge.id)) {
+      if (
+        draggingIds.includes(edge.source) ||
+        draggingIds.includes(edge.target)
+      ) {
+        if (
+          selections.includes(edge.id) ||
+          actives.includes(edge.id) ||
+          hoveredEdgeIds.includes(edge.id)
+        ) {
           draggingActive.push(edge);
         } else {
           draggingInactive.push(edge);
@@ -122,14 +133,18 @@ export const Edges: FC<EdgesProps> = ({
         return;
       }
 
-      if (selections.includes(edge.id) || actives.includes(edge.id)) {
+      if (
+        selections.includes(edge.id) ||
+        actives.includes(edge.id) ||
+        hoveredEdgeIds.includes(edge.id)
+      ) {
         active.push(edge);
       } else {
         inactive.push(edge);
       }
     });
     return [active, inactive, draggingActive, draggingInactive];
-  }, [edges, actives, selections, draggingId]);
+  }, [edges, actives, selections, draggingIds, hoveredEdgeIds]);
 
   const hasSelections = !!selections.length;
 
@@ -147,12 +162,12 @@ export const Edges: FC<EdgesProps> = ({
   useEdgePositionAnimation(staticEdgesGeometry, animated);
 
   useEffect(() => {
-    if (draggingId === null) {
+    if (draggingIds.length === 0) {
       const edgeGeometries = getGeometries(edges);
       const edgeMeshes = edgeGeometries.map(edge => new Mesh(edge));
       setEdgeMeshes(edgeMeshes);
     }
-  }, [getGeometries, setEdgeMeshes, edges, draggingId]);
+  }, [getGeometries, setEdgeMeshes, edges, draggingIds.length]);
 
   const staticEdgesRef = useRef(new Mesh());
   const dynamicEdgesRef = useRef(new Mesh());
@@ -186,7 +201,7 @@ export const Edges: FC<EdgesProps> = ({
     disabled
   );
 
-  const draggingIdRef = useRef<string | null>(null);
+  const draggingIdRef = useRef<string[]>([]);
   const intersectingRef = useRef<Array<InternalGraphEdge>>([]);
 
   useFrame(state => {
@@ -197,15 +212,18 @@ export const Edges: FC<EdgesProps> = ({
     }
 
     const previousDraggingId = draggingIdRef.current;
-    if (draggingId || (draggingId === null && previousDraggingId !== null)) {
+    if (
+      draggingIds.length ||
+      (draggingIds.length === 0 && previousDraggingId !== null)
+    ) {
       dynamicEdgesRef.current.geometry = getGeometry(
         draggingActive,
         draggingInactive
       );
     }
 
-    draggingIdRef.current = draggingId;
-    if (draggingId) {
+    draggingIdRef.current = draggingIds;
+    if (draggingIds.length) {
       return;
     }
 
@@ -232,6 +250,7 @@ export const Edges: FC<EdgesProps> = ({
           opacity={inactiveOpacity}
           side={DoubleSide}
           transparent={true}
+          vertexColors={true}
         />
         <a.meshBasicMaterial
           attach="material-1"
@@ -264,18 +283,29 @@ export const Edges: FC<EdgesProps> = ({
           transparent={true}
         />
       </mesh>
-      {edges.map(edge => (
-        <Edge
-          animated={animated}
-          contextMenu={contextMenu}
-          color={theme.edge.label.color}
-          disabled={disabled}
-          edge={edge}
-          key={edge.id}
-          labelFontUrl={labelFontUrl}
-          labelPlacement={labelPlacement}
-        />
-      ))}
+      {edges.map(edge => {
+        const isSelected = selections.includes(edge.id);
+        const isActive = actives.includes(edge.id);
+        const isHovered = hoveredEdgeIds.includes(edge.id);
+
+        return (
+          <Edge
+            animated={animated}
+            contextMenu={contextMenu}
+            color={
+              isSelected || isActive || isHovered
+                ? theme.edge.label.activeColor
+                : theme.edge.label.color
+            }
+            disabled={disabled}
+            edge={edge}
+            key={edge.id}
+            labelFontUrl={labelFontUrl}
+            labelPlacement={labelPlacement}
+            active={isSelected || isActive || isHovered}
+          />
+        );
+      })}
     </group>
   );
 };

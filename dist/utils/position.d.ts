@@ -1,4 +1,5 @@
-import { Curve, Vector3 } from 'three';
+import { EdgeSubLabelPosition } from 'symbols/Edge';
+import { Curve, CatmullRomCurve3, Vector3 } from 'three';
 import { InternalGraphNode, InternalVector3 } from '../types';
 /**
  * Get the midpoint given two points.
@@ -17,6 +18,10 @@ export declare function getCurvePoints(from: Vector3, to: Vector3, offset?: numb
  */
 export declare function getCurve(from: Vector3, fromOffset: number, to: Vector3, toOffset: number, curved: boolean, curveOffset?: number): Curve<Vector3>;
 /**
+ * Get the curve for a self-loop.
+ */
+export declare function getSelfLoopCurve(from: InternalGraphNode): CatmullRomCurve3;
+/**
  * Create a threejs vector for a node.
  */
 export declare function getVector(node: InternalGraphNode): Vector3;
@@ -30,7 +35,7 @@ export declare function updateNodePosition(node: InternalGraphNode, offset: Vect
         z: number;
         id: string;
         data: any;
-        links: import("../types").InternalGraphLink[];
+        links: import('../types').InternalGraphLink[];
         index: number;
         vx: number;
         vy: number;
@@ -42,6 +47,7 @@ export declare function updateNodePosition(node: InternalGraphNode, offset: Vect
     icon?: string;
     fill?: string;
     activeFill?: string;
+    cluster?: string;
     id: string;
     data?: any;
     label?: string;
@@ -63,4 +69,28 @@ export declare function calculateEdgeCurveOffset({ edge, edges, curved }: {
 }): {
     curved: any;
     curveOffset: number;
+};
+/**
+ * Calculate the offset position for a subLabel based on edge orientation and placement preference
+ *
+ * @param fromPosition - Position of the source node
+ * @param toPosition - Position of the target node
+ * @param subLabelPlacement - Whether to place the subLabel 'above' or 'below' the edge
+ * @returns Object with x, y offset values for positioning the subLabel perpendicular to the edge
+ *
+ * The function calculates a perpendicular offset from the edge line, with the direction
+ * determined by both the subLabelPlacement ('above' or 'below') and the edge direction.
+ * The perpendicular angle is calculated differently based on whether the edge is going
+ * left-to-right or right-to-left to maintain consistent 'above'/'below' positioning.
+ */
+export declare function calculateSubLabelOffset(fromPosition: {
+    x: number;
+    y: number;
+}, toPosition: {
+    x: number;
+    y: number;
+}, subLabelPlacement?: EdgeSubLabelPosition): {
+    x: number;
+    y: number;
+    z: number;
 };

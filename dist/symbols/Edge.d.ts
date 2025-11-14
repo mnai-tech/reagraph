@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
-import { EdgeArrowPosition } from './Arrow';
-import { ContextMenuEvent, InternalGraphEdge } from '../types';
 import { ThreeEvent } from '@react-three/fiber';
+import { FC, default as React } from 'react';
+import { ContextMenuEvent, InternalGraphEdge } from '../types';
+import { EdgeArrowPosition } from './Arrow';
 /**
  * Label positions relatively edge.
  *
@@ -11,6 +11,13 @@ import { ThreeEvent } from '@react-three/fiber';
  * - natural: normal text positions
  */
 export type EdgeLabelPosition = 'below' | 'above' | 'inline' | 'natural';
+/**
+ * SubLabel positions relatively to the main label.
+ *
+ * - below: show subLabel below the main label
+ * - above: show subLabel above the main label
+ */
+export type EdgeSubLabelPosition = 'below' | 'above';
 /**
  * Type of edge interpolation.
  *
@@ -39,6 +46,10 @@ export interface EdgeProps {
      * The placement of the edge label.
      */
     labelPlacement?: EdgeLabelPosition;
+    /**
+     * The placement of the edge subLabel relative to the main label.
+     */
+    subLabelPlacement?: EdgeSubLabelPosition;
     /**
      * The placement of the edge arrow.
      */

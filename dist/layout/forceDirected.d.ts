@@ -1,6 +1,7 @@
+import { ClusterGroup } from '../utils/cluster';
 import { DagMode } from './forceUtils';
-import { LayoutFactoryProps, LayoutStrategy } from './types';
 import { FORCE_LAYOUTS } from './layoutProvider';
+import { LayoutFactoryProps, LayoutStrategy } from './types';
 export interface ForceDirectedLayoutInputs extends LayoutFactoryProps {
     /**
      * Center inertia for the layout. Default: 1.
@@ -26,6 +27,10 @@ export interface ForceDirectedLayoutInputs extends LayoutFactoryProps {
      * Strength of the cluster repulsion.
      */
     clusterStrength?: number;
+    /**
+     * The clusters dragged position to reuse for the layout.
+     */
+    clusters: Map<string, ClusterGroup>;
     /**
      * The type of clustering.
      */
@@ -59,4 +64,4 @@ export interface ForceDirectedLayoutInputs extends LayoutFactoryProps {
      */
     forceLayout: (typeof FORCE_LAYOUTS)[number];
 }
-export declare function forceDirected({ graph, nodeLevelRatio, mode, dimensions, nodeStrength, linkDistance, clusterStrength, linkStrengthInterCluster, linkStrengthIntraCluster, forceLinkDistance, forceLinkStrength, clusterType, forceCharge, getNodePosition, drags, clusterAttribute, forceLayout }: ForceDirectedLayoutInputs): LayoutStrategy;
+export declare function forceDirected({ graph, nodeLevelRatio, mode, dimensions, nodeStrength, linkDistance, clusterStrength, linkStrengthInterCluster, linkStrengthIntraCluster, forceLinkDistance, forceLinkStrength, clusterType, forceCharge, getNodePosition, drags, clusters, clusterAttribute, forceLayout }: ForceDirectedLayoutInputs): LayoutStrategy;

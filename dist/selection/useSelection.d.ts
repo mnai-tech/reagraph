@@ -32,10 +32,6 @@ export interface SelectionProps {
      */
     disabled?: boolean;
     /**
-     * Hotkey types
-     */
-    hotkeys?: HotkeyTypes[];
-    /**
      * Whether to focus on select or not.
      */
     focusOnSelect?: boolean | 'singleOnly';
@@ -114,4 +110,4 @@ export interface SelectionResult {
      */
     onNodePointerOut?: (node: GraphNode) => void;
 }
-export declare const useSelection: ({ selections, nodes, actives, focusOnSelect, type, pathHoverType, pathSelectionType, ref, hotkeys, disabled, onSelection }: SelectionProps) => SelectionResult;
+export declare const useSelection: ({ selections, nodes, actives, focusOnSelect, type, pathHoverType, pathSelectionType, ref, disabled, onSelection }: SelectionProps) => SelectionResult;

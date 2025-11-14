@@ -3,7 +3,7 @@ export interface CircularLayoutInputs extends LayoutFactoryProps {
     /**
      * Radius of the circle.
      */
-    radius: 300;
+    radius: number;
 }
 export declare function circular2d({ graph, radius, drags, getNodePosition }: CircularLayoutInputs): {
     step(): boolean;

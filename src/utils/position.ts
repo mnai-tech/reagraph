@@ -1,5 +1,13 @@
-import { Curve, LineCurve3, QuadraticBezierCurve3, Vector3 } from 'three';
-import { InternalGraphNode, InternalVector3 } from '../types';
+import type { EdgeSubLabelPosition } from 'symbols/Edge';
+import type { Curve } from 'three';
+import {
+  CatmullRomCurve3,
+  LineCurve3,
+  QuadraticBezierCurve3,
+  Vector3
+} from 'three';
+
+import type { InternalGraphNode, InternalVector3 } from '../types';
 
 const MULTI_EDGE_OFFSET_FACTOR = 0.7;
 
@@ -63,9 +71,50 @@ export function getCurve(
   const offsetTo = getPointBetween(to, from, toOffset);
   return curved
     ? new QuadraticBezierCurve3(
-      ...getCurvePoints(offsetFrom, offsetTo, curveOffset)
-    )
+        ...getCurvePoints(offsetFrom, offsetTo, curveOffset)
+      )
     : new LineCurve3(offsetFrom, offsetTo);
+}
+
+/**
+ * Get the curve for a self-loop.
+ */
+export function getSelfLoopCurve(from: InternalGraphNode) {
+  const nodePosition = getVector(from);
+  const loopRadius = from.size;
+  const angle = Math.PI / 2; // 90 degrees on top of the node
+
+  const loopCenter = nodePosition
+    .clone()
+    .add(
+      new Vector3(
+        loopRadius * Math.cos(angle),
+        loopRadius * 1.3 * Math.sin(angle),
+        0
+      )
+    );
+
+  // Create selfLoopCurve
+  const numPoints = 10; // Use more points for smoother curve
+  const points: Vector3[] = [];
+
+  for (let i = 0; i < numPoints; i++) {
+    const theta = (i / numPoints) * 2 * Math.PI;
+    points.push(
+      loopCenter
+        .clone()
+        .add(
+          new Vector3(
+            loopRadius * Math.cos(theta),
+            loopRadius * Math.sin(theta),
+            0
+          )
+        )
+    );
+  }
+  const selfLoopCurve = new CatmullRomCurve3(points, true);
+
+  return selfLoopCurve;
 }
 
 /**
@@ -120,15 +169,67 @@ export function calculateEdgeCurveOffset({ edge, edges, curved }) {
     updatedCurved = true;
     const edgeIndex = parallelEdges.indexOf(edge.id);
 
-    if (parallelEdges.length === 2) {
-      curveOffset =
-        edgeIndex === 0 ? MULTI_EDGE_OFFSET_FACTOR : -MULTI_EDGE_OFFSET_FACTOR;
-    } else {
-      curveOffset =
-        (edgeIndex - Math.floor(parallelEdges.length / 2)) *
-        MULTI_EDGE_OFFSET_FACTOR;
-    }
+    // Progressive distribution with unique magnitude for each edge
+    // This prevents overlapping by ensuring each edge has sufficient separation
+    const offsetMultiplier = edgeIndex === 0 ? 1 : 1 + edgeIndex * 0.8;
+    const side = edgeIndex % 2 === 0 ? 1 : -1;
+    const magnitude = MULTI_EDGE_OFFSET_FACTOR * offsetMultiplier;
+    curveOffset = side * magnitude;
+  }
+
+  if (edge.data?.isAggregated && edges.length > 1) {
+    const edgeIndex = parallelEdges.indexOf(edge.id);
+    return {
+      curved: true,
+      curveOffset:
+        edgeIndex === 0 ? MULTI_EDGE_OFFSET_FACTOR : -MULTI_EDGE_OFFSET_FACTOR
+    };
   }
 
   return { curved: updatedCurved, curveOffset };
+}
+
+/**
+ * Calculate the offset position for a subLabel based on edge orientation and placement preference
+ *
+ * @param fromPosition - Position of the source node
+ * @param toPosition - Position of the target node
+ * @param subLabelPlacement - Whether to place the subLabel 'above' or 'below' the edge
+ * @returns Object with x, y offset values for positioning the subLabel perpendicular to the edge
+ *
+ * The function calculates a perpendicular offset from the edge line, with the direction
+ * determined by both the subLabelPlacement ('above' or 'below') and the edge direction.
+ * The perpendicular angle is calculated differently based on whether the edge is going
+ * left-to-right or right-to-left to maintain consistent 'above'/'below' positioning.
+ */
+export function calculateSubLabelOffset(
+  fromPosition: { x: number; y: number },
+  toPosition: { x: number; y: number },
+  subLabelPlacement?: EdgeSubLabelPosition
+): { x: number; y: number; z: number } {
+  // Calculate direction vector between nodes
+  const dx = toPosition.x - fromPosition.x;
+  const dy = toPosition.y - fromPosition.y;
+
+  // Get angle of the edge
+  const angle = Math.atan2(dy, dx);
+
+  // Calculate perpendicular angle based on edge direction and subLabelPlacement
+  const perpAngle =
+    subLabelPlacement === 'above'
+      ? dx >= 0
+        ? angle + Math.PI / 2
+        : angle - Math.PI / 2
+      : dx >= 0
+        ? angle - Math.PI / 2
+        : angle + Math.PI / 2;
+
+  // Offset distance for subLabel
+  const offsetDistance = 7;
+
+  // Calculate offset using perpendicular angle
+  const offsetX = Math.cos(perpAngle) * offsetDistance;
+  const offsetY = Math.sin(perpAngle) * offsetDistance;
+
+  return { x: offsetX, y: offsetY, z: 0 };
 }
