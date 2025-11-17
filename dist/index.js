@@ -1580,99 +1580,118 @@ const Ring$1 = ({
     ] })
   ] });
 };
+const calculateTextSize = (text, fontSize, maxWidth, ellipsis, active) => {
+  const shortText = ellipsis && !active ? ellipsize(text, ellipsis) : text;
+  const lines = [];
+  let currentLine = "";
+  const words = shortText.split(" ");
+  words.forEach((word) => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = testLine.length * fontSize * 1;
+    if (testWidth > maxWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  const width = Math.min(
+    maxWidth,
+    lines.reduce(
+      (max, line) => Math.max(max, line.length * fontSize * 0.4),
+      0
+    )
+  ) + 14;
+  const height = lines.length * fontSize + 6;
+  return { width, height, text: lines.join("\n"), lineCount: lines.length };
+};
 const Label = ({
   text,
-  fontSize = 7,
+  fontSize = 4,
   fontUrl,
-  color,
+  color = "#2A6475",
   opacity = 1,
   stroke,
   backgroundColor,
-  backgroundOpacity = 1,
-  padding = 1,
-  strokeColor,
-  strokeWidth = 0,
-  radius = 0.1,
   active,
   rotation,
   maxWidth = 100,
   ellipsis = 100,
-  borderRadius,
-  labelVisible = true
+  borderRadius
 }) => {
-  const shortText = ellipsis && !active ? ellipsize(text, ellipsis) : text;
   const normalizedColor = useMemo(() => new Color(color), [color]);
+  const normalizedBackgroundColor = useMemo(
+    () => new Color(backgroundColor),
+    [backgroundColor]
+  );
   const normalizedStroke = useMemo(
     () => stroke ? new Color(stroke) : void 0,
     [stroke]
   );
-  const normalizedBackgroundColor = useMemo(
-    () => backgroundColor ? new Color(backgroundColor) : null,
-    [backgroundColor]
+  const {
+    width,
+    height,
+    text: processedText,
+    lineCount
+  } = useMemo(
+    () => calculateTextSize(text, fontSize, maxWidth, ellipsis, active),
+    [text, fontSize, maxWidth, ellipsis, active]
   );
-  const normalizedStrokeColor = useMemo(
-    () => strokeColor ? new Color(strokeColor) : null,
-    [strokeColor]
-  );
-  const normalizedRadius = Math.min(radius * fontSize, 3);
-  const charCount = shortText.length;
-  const estimatedWidth = charCount * fontSize * 0.6 + padding * 2;
-  const estimatedHeight = fontSize * 1.2 + padding * 2;
-  const backgroundDimensions = {
-    width: estimatedWidth,
-    height: estimatedHeight
-  };
-  const zPosition = active ? 2 : 1;
-  return /* @__PURE__ */ jsxs(Billboard, { position: [0, 0, zPosition], renderOrder: 1, children: [
-    strokeWidth > 0 && normalizedStrokeColor && normalizedBackgroundColor && /* @__PURE__ */ jsx("mesh", { position: [0, 0, 10], children: /* @__PURE__ */ jsx(
-      RoundedBox,
-      {
-        args: [
-          backgroundDimensions.width + strokeWidth,
-          backgroundDimensions.height + strokeWidth,
-          0.1
-        ],
-        radius: normalizedRadius,
-        smoothness: 8,
-        "material-color": normalizedStrokeColor,
-        "material-transparent": true,
-        "material-opacity": backgroundOpacity
-      }
-    ) }),
-    normalizedBackgroundColor && /* @__PURE__ */ jsx("mesh", { position: [0, 0, 10], children: /* @__PURE__ */ jsx(
-      RoundedBox,
-      {
-        args: [
-          backgroundDimensions.width,
-          backgroundDimensions.height,
-          0.1
-        ],
-        radius: normalizedRadius,
-        smoothness: 8,
-        "material-color": normalizedBackgroundColor,
-        "material-transparent": true,
-        "material-opacity": backgroundOpacity
-      }
-    ) }),
-    /* @__PURE__ */ jsx(
-      Text,
-      {
-        position: [0, 0, 11],
-        font: fontUrl,
-        fontSize,
-        color: normalizedColor,
-        fillOpacity: opacity,
-        textAlign: "center",
-        outlineWidth: stroke ? 1 : 0,
-        outlineColor: normalizedStroke,
-        depthOffset: 0,
-        maxWidth,
-        overflowWrap: "break-word",
-        rotation,
-        children: shortText
-      }
-    )
-  ] });
+  return /* @__PURE__ */ jsx(Billboard, { children: backgroundColor ? /* @__PURE__ */ jsx("mesh", { children: /* @__PURE__ */ jsxs(
+    RoundedBox,
+    {
+      position: [0, lineCount * -2, 10],
+      args: [width, height, 0],
+      radius: borderRadius,
+      rotation,
+      children: [
+        /* @__PURE__ */ jsx(
+          Text,
+          {
+            font: fontUrl,
+            fontSize,
+            color: normalizedColor,
+            fillOpacity: opacity,
+            textAlign: "center",
+            outlineWidth: stroke ? 1 : 0,
+            outlineColor: stroke ? normalizedStroke : null,
+            depthOffset: 0,
+            maxWidth,
+            overflowWrap: "break-word",
+            children: processedText
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          a.meshBasicMaterial,
+          {
+            attach: "material",
+            opacity,
+            depthTest: true,
+            color: normalizedBackgroundColor
+          }
+        )
+      ]
+    }
+  ) }) : /* @__PURE__ */ jsx(
+    Text,
+    {
+      font: fontUrl,
+      fontSize,
+      color: normalizedColor,
+      fillOpacity: opacity,
+      textAlign: "center",
+      outlineWidth: stroke ? 1 : 0,
+      outlineColor: normalizedStroke,
+      depthOffset: 0,
+      maxWidth,
+      overflowWrap: "break-word",
+      rotation,
+      children: processedText
+    }
+  ) });
 };
 const Cluster = ({
   animated,

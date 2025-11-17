@@ -177,12 +177,12 @@ export const WithBackgrounds = () => {
               text={node.label || ''}
               fontSize={4}
               backgroundColor={node.data?.bgColor}
-              strokeColor={node.data?.strokeColor}
-              strokeWidth={node.data?.strokeWidth}
-              backgroundOpacity={node.data?.backgroundOpacity}
+              // strokeColor={node.data?.strokeColor}
+              // strokeWidth={node.data?.strokeWidth}
+              // backgroundOpacity={node.data?.backgroundOpacity}
               color={node.data?.textColor}
-              padding={node.data?.padding}
-              radius={node.data?.radius}
+              // padding={node.data?.padding}
+              // radius={node.data?.radius}
             />
           </group>
         </group>

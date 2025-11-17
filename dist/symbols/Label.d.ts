@@ -23,30 +23,6 @@ export interface LabelProps {
      */
     stroke?: ColorRepresentation;
     /**
-     * Background color of the label.
-     */
-    backgroundColor?: ColorRepresentation;
-    /**
-     * Opacity of the background.
-     */
-    backgroundOpacity?: number;
-    /**
-     * Padding around the text for background sizing.
-     */
-    padding?: number;
-    /**
-     * Color of the background stroke/border.
-     */
-    strokeColor?: ColorRepresentation;
-    /**
-     * Size of the background stroke/border.
-     */
-    strokeWidth?: number;
-    /**
-     * Corner radius of the background.
-     */
-    radius?: number;
-    /**
      * Opacity for the label.
      */
     opacity?: number;
@@ -66,6 +42,10 @@ export interface LabelProps {
      * Maximum width of the label.
      */
     maxWidth?: number;
+    /**
+     * Background color of the label.
+     */
+    backgroundColor?: ColorRepresentation;
     /**
      * Border radius of the label.
      */
