@@ -1,9 +1,51 @@
+import { a } from '@react-spring/three';
 import { Billboard, RoundedBox, Text } from '@react-three/drei';
 import ellipsize from 'ellipsize';
 import type { FC } from 'react';
 import React, { useMemo } from 'react';
 import type { ColorRepresentation, Euler } from 'three';
 import { Color } from 'three';
+
+const calculateTextSize = (
+  text: string,
+  fontSize: number,
+  maxWidth: number,
+  ellipsis: number,
+  active: boolean
+) => {
+  const shortText = ellipsis && !active ? ellipsize(text, ellipsis) : text;
+  const lines = [];
+  let currentLine = '';
+  const words = shortText.split(' ');
+
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = testLine.length * fontSize * 1;
+
+    if (testWidth > maxWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  const width =
+    Math.min(
+      maxWidth,
+      lines.reduce(
+        (max, line) => Math.max(max, line.length * fontSize * 0.4),
+        0
+      )
+    ) + 14;
+  const height = lines.length * fontSize + 6;
+
+  return { width, height, text: lines.join('\n'), lineCount: lines.length };
+};
 
 export interface LabelProps {
   /**
@@ -33,36 +75,6 @@ export interface LabelProps {
   stroke?: ColorRepresentation;
 
   /**
-   * Background color of the label.
-   */
-  backgroundColor?: ColorRepresentation;
-
-  /**
-   * Opacity of the background.
-   */
-  backgroundOpacity?: number;
-
-  /**
-   * Padding around the text for background sizing.
-   */
-  padding?: number;
-
-  /**
-   * Color of the background stroke/border.
-   */
-  strokeColor?: ColorRepresentation;
-
-  /**
-   * Size of the background stroke/border.
-   */
-  strokeWidth?: number;
-
-  /**
-   * Corner radius of the background.
-   */
-  radius?: number;
-
-  /**
    * Opacity for the label.
    */
   opacity?: number;
@@ -88,6 +100,11 @@ export interface LabelProps {
   maxWidth?: number;
 
   /**
+   * Background color of the label.
+   */
+  backgroundColor?: ColorRepresentation;
+
+  /**
    * Border radius of the label.
    */
   borderRadius?: number;
@@ -105,108 +122,94 @@ export interface LabelProps {
 
 export const Label: FC<LabelProps> = ({
   text,
-  fontSize = 7,
+  fontSize = 4,
   fontUrl,
-  color,
+  color = '#2A6475',
   opacity = 1,
   stroke,
   backgroundColor,
-  backgroundOpacity = 1,
-  padding = 1,
-  strokeColor,
-  strokeWidth = 0,
-  radius = 0.1,
   active,
   rotation,
   maxWidth = 100,
   ellipsis = 100,
-  borderRadius,
-  labelVisible = true
+  borderRadius
 }) => {
-  const shortText = ellipsis && !active ? ellipsize(text, ellipsis) : text;
   const normalizedColor = useMemo(() => new Color(color), [color]);
+  const normalizedBackgroundColor = useMemo(
+    () => new Color(backgroundColor),
+    [backgroundColor]
+  );
   const normalizedStroke = useMemo(
     () => (stroke ? new Color(stroke) : undefined),
     [stroke]
   );
-  const normalizedBackgroundColor = useMemo(
-    () => (backgroundColor ? new Color(backgroundColor) : null),
-    [backgroundColor]
+
+  const {
+    width,
+    height,
+    text: processedText,
+    lineCount
+  } = useMemo(
+    () => calculateTextSize(text, fontSize, maxWidth, ellipsis, active),
+    [text, fontSize, maxWidth, ellipsis, active]
   );
-  const normalizedStrokeColor = useMemo(
-    () => (strokeColor ? new Color(strokeColor) : null),
-    [strokeColor]
-  );
-  // Normalize the radius to be between 0 and 3
-  const normalizedRadius = Math.min(radius * fontSize, 3);
-
-  // Calculate background dimensions based on text and fontSize
-  const charCount = shortText.length;
-  const estimatedWidth = charCount * fontSize * 0.6 + padding * 2;
-  const estimatedHeight = fontSize * 1.2 + padding * 2;
-
-  const backgroundDimensions = {
-    width: estimatedWidth,
-    height: estimatedHeight
-  };
-
-  // Dynamic z-position based on active state
-  const zPosition = active ? 2 : 1;
 
   return (
-    <Billboard position={[0, 0, zPosition]} renderOrder={1}>
-      {/* Stroke layer - rendered behind the background */}
-      {strokeWidth > 0 &&
-        normalizedStrokeColor &&
-        normalizedBackgroundColor && (
-          <mesh position={[0, 0, 10]}>
-            <RoundedBox
-              args={[
-                backgroundDimensions.width + strokeWidth,
-                backgroundDimensions.height + strokeWidth,
-                0.1
-              ]}
-              radius={normalizedRadius}
-              smoothness={8}
-              material-color={normalizedStrokeColor}
-              material-transparent={true}
-              material-opacity={backgroundOpacity}
-            />
-          </mesh>
-        )}
-      {/* Background layer */}
-      {normalizedBackgroundColor && (
-        <mesh position={[0, 0, 10]}>
+    <Billboard>
+      {backgroundColor ? (
+        <mesh>
           <RoundedBox
-            args={[
-              backgroundDimensions.width,
-              backgroundDimensions.height,
-              0.1
-            ]}
-            radius={normalizedRadius}
-            smoothness={8}
-            material-color={normalizedBackgroundColor}
-            material-transparent={true}
-            material-opacity={backgroundOpacity}
-          />
+            position={[0, lineCount * -2, 10]}
+            args={[width, height, 0]} // Width, height, depth.
+            radius={borderRadius}
+            rotation={rotation}
+          >
+            <Text
+              font={fontUrl}
+              fontSize={fontSize}
+              color={normalizedColor}
+              fillOpacity={opacity}
+              textAlign="center"
+              outlineWidth={stroke ? 1 : 0}
+              outlineColor={stroke ? normalizedStroke : null}
+              depthOffset={0}
+              maxWidth={maxWidth}
+              overflowWrap="break-word"
+            >
+              {processedText}
+            </Text>
+            <a.meshBasicMaterial
+              attach="material"
+              opacity={opacity}
+              depthTest={true}
+              color={normalizedBackgroundColor}
+            />
+          </RoundedBox>
         </mesh>
+      ) : (
+        <Text
+          font={fontUrl}
+          fontSize={fontSize}
+          color={normalizedColor}
+          fillOpacity={opacity}
+          textAlign="center"
+          outlineWidth={stroke ? 1 : 0}
+          outlineColor={normalizedStroke}
+          depthOffset={0}
+          maxWidth={maxWidth}
+          overflowWrap="break-word"
+          rotation={rotation}
+        >
+          {processedText}
+        </Text>
       )}
-      <Text
-        position={[0, 0, 11]}
-        font={fontUrl}
-        fontSize={fontSize}
-        color={normalizedColor}
-        fillOpacity={opacity}
-        textAlign="center"
-        outlineWidth={stroke ? 1 : 0}
-        outlineColor={normalizedStroke}
-        depthOffset={0}
-        maxWidth={maxWidth}
-        overflowWrap="break-word"
-        rotation={rotation}
-      >
-        {shortText}
-      </Text>
     </Billboard>
   );
 };
+
+// Label.defaultProps = {
+//   opacity: 1,
+//   fontSize: 4,
+//   color: '#2A6475',
+//   ellipsis: 100
+// };

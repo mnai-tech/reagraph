@@ -3175,7 +3175,7 @@
       },
       "fontSize": {
         "defaultValue": {
-          "value": "7"
+          "value": "4"
         },
         "description": "Size of the font.",
         "name": "fontSize",
@@ -3195,7 +3195,9 @@
         }
       },
       "color": {
-        "defaultValue": null,
+        "defaultValue": {
+          "value": "#2A6475"
+        },
         "description": "Color of the text.",
         "name": "color",
         "parent": {
@@ -3230,128 +3232,6 @@
         "required": false,
         "type": {
           "name": "ColorRepresentation"
-        }
-      },
-      "backgroundColor": {
-        "defaultValue": null,
-        "description": "Background color of the label.",
-        "name": "backgroundColor",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "ColorRepresentation"
-        }
-      },
-      "backgroundOpacity": {
-        "defaultValue": {
-          "value": "1"
-        },
-        "description": "Opacity of the background.",
-        "name": "backgroundOpacity",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "number"
-        }
-      },
-      "padding": {
-        "defaultValue": {
-          "value": "1"
-        },
-        "description": "Padding around the text for background sizing.",
-        "name": "padding",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "number"
-        }
-      },
-      "strokeColor": {
-        "defaultValue": null,
-        "description": "Color of the background stroke/border.",
-        "name": "strokeColor",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "ColorRepresentation"
-        }
-      },
-      "strokeWidth": {
-        "defaultValue": {
-          "value": "0"
-        },
-        "description": "Size of the background stroke/border.",
-        "name": "strokeWidth",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "number"
-        }
-      },
-      "radius": {
-        "defaultValue": {
-          "value": "0.1"
-        },
-        "description": "Corner radius of the background.",
-        "name": "radius",
-        "parent": {
-          "fileName": "src/symbols/Label.tsx",
-          "name": "LabelProps"
-        },
-        "declarations": [
-          {
-            "fileName": "src/symbols/Label.tsx",
-            "name": "LabelProps"
-          }
-        ],
-        "required": false,
-        "type": {
-          "name": "number"
         }
       },
       "opacity": {
@@ -3455,6 +3335,25 @@
           "name": "number"
         }
       },
+      "backgroundColor": {
+        "defaultValue": null,
+        "description": "Background color of the label.",
+        "name": "backgroundColor",
+        "parent": {
+          "fileName": "src/symbols/Label.tsx",
+          "name": "LabelProps"
+        },
+        "declarations": [
+          {
+            "fileName": "src/symbols/Label.tsx",
+            "name": "LabelProps"
+          }
+        ],
+        "required": false,
+        "type": {
+          "name": "ColorRepresentation"
+        }
+      },
       "borderRadius": {
         "defaultValue": null,
         "description": "Border radius of the label.",
@@ -3494,9 +3393,7 @@
         }
       },
       "labelVisible": {
-        "defaultValue": {
-          "value": "true"
-        },
+        "defaultValue": null,
         "description": "label visible or not",
         "name": "labelVisible",
         "parent": {

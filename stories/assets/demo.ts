@@ -8,7 +8,7 @@ export const random = (floor, ceil) => Math.floor(Math.random() * ceil) + floor;
 
 export const simpleNodes: GraphNode[] = range(5).map(i => ({
   id: `n-${i}`,
-  label: `Node ${i}`,
+  label: `Node asasas asa saszxzx asasas ${i}`,
   data: {
     priority: random(0, 10)
   },
