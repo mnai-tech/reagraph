@@ -1,8 +1,6 @@
-import { hierarchy, stratify, tree } from 'd3-hierarchy';
+import { hierarchy, tree } from 'd3-hierarchy';
 
 import type { InternalGraphNode } from '../types';
-import type { DepthNode } from './depthUtils';
-import { getNodeDepth } from './depthUtils';
 import { buildNodeEdges } from './layoutUtils';
 import type { LayoutFactoryProps, LayoutStrategy } from './types';
 
@@ -98,34 +96,48 @@ export function hierarchical({
     });
   }
 
-  const { depths } = getNodeDepth(nodes, edges);
-  const rootNodes = Object.keys(depths).map(d => depths[d]);
+  // const { depths } = getNodeDepth(nodes, edges);
+  // Find the root node (or fake root if present)
+  const rootNode =
+    nodes.find(n => !edges.find(e => e.target === n.id)) || nodes[0];
+  // Build a map from node id to node for quick lookup
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
-  const root = stratify<DepthNode>()
-    .id(d => d.data.id)
-    .parentId(d => d.ins?.[0]?.data?.id)(rootNodes);
+  // Build a tree structure for d3.hierarchy
+  function buildTree(node: InternalGraphNode): InternalGraphNode & {
+    children?: (InternalGraphNode & { children?: any })[];
+  } {
+    const children = edges
+      .filter(e => e.source === node.id)
+      .map(e => nodeMap.get(e.target))
+      .filter((c): c is InternalGraphNode => Boolean(c));
+    return {
+      ...node,
+      children: children.length > 0 ? children.map(buildTree) : undefined
+    };
+  }
 
-  const treeRoot = tree()
+  const d3Root = hierarchy(buildTree(rootNode));
+  const treeLayout = tree()
     .separation(() => nodeSeparation)
-    .nodeSize(nodeSize)(hierarchy(root));
-
+    .nodeSize(nodeSize);
+  const treeRoot = treeLayout(d3Root);
   const treeNodes = treeRoot.descendants();
   const path = DIRECTION_MAP[mode];
 
-  const mappedNodes = new Map<string, InternalGraphNode>(
-    nodes.map(n => {
-      const { x, y } = treeNodes.find((t: any) => t.data.id === n.id);
-      return [
-        n.id,
-        {
-          ...n,
-          [path.x]: x * path.factor,
-          [path.y]: y * path.factor,
-          z: 0
-        }
-      ];
-    })
-  );
+  // Map node id to position
+  const mappedNodes = new Map<string, InternalGraphNode>();
+  treeNodes.forEach(t => {
+    const data = t.data as InternalGraphNode;
+    if (!data || !data.id) return;
+    const n = nodeMap.get(data.id);
+    if (!n) return;
+    mappedNodes.set(data.id, {
+      ...n,
+      [path.x]: t.x * path.factor,
+      [path.y]: t.y * path.factor
+    });
+  });
 
   return {
     step() {
