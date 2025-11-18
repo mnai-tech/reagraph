@@ -32,7 +32,7 @@ import circular from "graphology-layout/circular.js";
 import random from "graphology-layout/random.js";
 import forceAtlas2Layout from "graphology-layout-forceatlas2";
 import { forceSimulation, forceX, forceY, forceCollide, forceManyBody, forceLink, forceRadial as forceRadial$1, forceCenter, forceZ } from "d3-force-3d";
-import { treemap, hierarchy, stratify, tree } from "d3-hierarchy";
+import { treemap, hierarchy, tree } from "d3-hierarchy";
 import noverlapLayout from "graphology-layout-noverlap";
 import classNames from "classnames";
 const animationConfig = {
@@ -4570,26 +4570,32 @@ function hierarchical({
       });
     });
   }
-  const { depths } = getNodeDepth(nodes, edges);
-  const rootNodes = Object.keys(depths).map((d) => depths[d]);
-  const root = stratify().id((d) => d.data.id).parentId((d) => d.ins?.[0]?.data?.id)(rootNodes);
-  const treeRoot = tree().separation(() => nodeSeparation).nodeSize(nodeSize)(hierarchy(root));
+  const rootNode = nodes.find((n) => !edges.find((e) => e.target === n.id)) || nodes[0];
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  function buildTree(node) {
+    const children = edges.filter((e) => e.source === node.id).map((e) => nodeMap.get(e.target)).filter((c) => Boolean(c));
+    return {
+      ...node,
+      children: children.length > 0 ? children.map(buildTree) : void 0
+    };
+  }
+  const d3Root = hierarchy(buildTree(rootNode));
+  const treeLayout = tree().separation(() => nodeSeparation).nodeSize(nodeSize);
+  const treeRoot = treeLayout(d3Root);
   const treeNodes = treeRoot.descendants();
   const path = DIRECTION_MAP[mode];
-  const mappedNodes = new Map(
-    nodes.map((n) => {
-      const { x, y } = treeNodes.find((t) => t.data.id === n.id);
-      return [
-        n.id,
-        {
-          ...n,
-          [path.x]: x * path.factor,
-          [path.y]: y * path.factor,
-          z: 0
-        }
-      ];
-    })
-  );
+  const mappedNodes = /* @__PURE__ */ new Map();
+  treeNodes.forEach((t) => {
+    const data = t.data;
+    if (!data || !data.id) return;
+    const n = nodeMap.get(data.id);
+    if (!n) return;
+    mappedNodes.set(data.id, {
+      ...n,
+      [path.x]: t.x * path.factor,
+      [path.y]: t.y * path.factor
+    });
+  });
   return {
     step() {
       return true;
